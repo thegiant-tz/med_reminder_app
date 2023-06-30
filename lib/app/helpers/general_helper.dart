@@ -5,7 +5,6 @@ import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:medication_reminder_app/app/helpers/color_helper.dart';
 import 'package:medication_reminder_app/app/services/notification_service.dart';
-import 'package:medication_reminder_app/resources/view/screens/home_screen.dart';
 import 'package:medication_reminder_app/resources/view/screens/home_screens/treatment_screen.dart';
 
 printHello() {
@@ -96,13 +95,14 @@ void showSnackBar(
 
 void showNotification(response) {
   NotificationService.showNotification(
-      id: response['id'],
-      title: 'Medication Reminder',
-      body:
-          'Habari, Muda wa kumeza dawa umewadia, Hakikisha unaweza dawa kwa wakati',
-      scheduled: true,
-      fromDate: DateTime.now(),
-      interval: 10);
+    id: response['id'],
+    title: 'Medication Reminder',
+    body:
+        'Habari, Muda wa kumeza dawa umewadia, Hakikisha unaweza dawa kwa wakati',
+    scheduled: true,
+    fromDate: DateTime.now(),
+    interval: 10,
+  );
 }
 
 const List<int> oftenList = <int>[

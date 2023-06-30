@@ -11,31 +11,62 @@ class PatientTreatment extends StatefulWidget {
 }
 
 class _PatientTreatmentState extends State<PatientTreatment> {
-  TextEditingController dmedNameController =
-      TextEditingController(text: 'Panadol');
   bool isEdit = false;
+  final data = Get.arguments;
+  final formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
+    final user = data['user'];
+    final reminder = data['reminder'];
+    bool isApproved = reminder['status'] == 'Approved';
+    TextEditingController dmedNameController =
+        TextEditingController(text: reminder['med_name'].toString());
+    TextEditingController oftenController =
+        TextEditingController(text: reminder['often'].toString());
+    TextEditingController dosageController =
+        TextEditingController(text: reminder['dosage'].toString());
+    TextEditingController intakeController =
+        TextEditingController(text: reminder['intake'].toString());
+    TextEditingController timeController =
+        TextEditingController(text: reminder['start_at'].toString());
+    TextEditingController unitController =
+        TextEditingController(text: reminder['unit']);
     return Scaffold(
       body: CustomScrollView(
         slivers: [
           SliverAppBar.large(
             foregroundColor: orange,
-            title: const Row(
+            title: Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.person_2,
                   color: orange,
                 ),
-                SizedBox(width: 8),
-                Text(
-                  'Patient Name',
-                  style: TextStyle(color: white),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    user['name'],
+                    style: const TextStyle(color: white),
+                  ),
                 ),
+                Visibility(
+                  visible: isEdit && !isApproved,
+                  child: const Badge(
+                    label: Text('Edit mode'),
+                    backgroundColor: Colors.blue,
+                  ),
+                ),
+                Visibility(
+                  visible: isApproved,
+                  child: const Badge(
+                    label: Text('Approved', style: TextStyle(color: black),),
+                    backgroundColor: orange,
+                  ),
+                )
               ],
             ),
             backgroundColor: primaryColor,
-            actions: [
+            actions: isApproved ? null : [
               TextButton(
                 onPressed: () {
                   setState(() {
@@ -58,7 +89,32 @@ class _PatientTreatmentState extends State<PatientTreatment> {
                 ),
               ),
               TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  if (formKey.currentState!.validate()) {
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: const Text('Confirmation'),
+                          content: const Text('Are you sure?'),
+                          actions: [
+                            TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: const Text(
+                                  'Cancel',
+                                  style: TextStyle(color: Colors.red),
+                                )),
+                            TextButton(
+                                onPressed: () {},
+                                child: const Text('Yes I\'m sure')),
+                          ],
+                        );
+                      },
+                    );
+                  }
+                },
                 child: const Row(
                   children: [
                     Icon(
@@ -85,6 +141,7 @@ class _PatientTreatmentState extends State<PatientTreatment> {
                   borderRadius: BorderRadius.circular(5),
                 ),
                 child: Form(
+                  key: formKey,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -106,18 +163,15 @@ class _PatientTreatmentState extends State<PatientTreatment> {
                         validator: (value) {
                           if (value!.isEmpty) {
                             return 'This field cannot be empty';
-                          } else if (!value.isEmail) {
-                            return 'Invalid email provided';
                           }
                           return null;
                         },
                       ),
-
                       const SizedBox(height: 15),
-                      const Text('Medication name'),
+                      const Text('Unit'),
                       TextFormField(
                         readOnly: !isEdit,
-                        controller: dmedNameController,
+                        controller: unitController,
                         decoration: const InputDecoration(
                             floatingLabelStyle: TextStyle(
                               color: secondaryColor,
@@ -132,18 +186,16 @@ class _PatientTreatmentState extends State<PatientTreatment> {
                         validator: (value) {
                           if (value!.isEmpty) {
                             return 'This field cannot be empty';
-                          } else if (!value.isEmail) {
-                            return 'Invalid email provided';
                           }
                           return null;
                         },
                       ),
-
                       const SizedBox(height: 15),
-                      const Text('Medication name'),
+                      const Text('Intake'),
                       TextFormField(
                         readOnly: !isEdit,
-                        controller: dmedNameController,
+                        controller: intakeController,
+                        keyboardType: TextInputType.number,
                         decoration: const InputDecoration(
                             floatingLabelStyle: TextStyle(
                               color: secondaryColor,
@@ -158,18 +210,16 @@ class _PatientTreatmentState extends State<PatientTreatment> {
                         validator: (value) {
                           if (value!.isEmpty) {
                             return 'This field cannot be empty';
-                          } else if (!value.isEmail) {
-                            return 'Invalid email provided';
                           }
                           return null;
                         },
                       ),
-
                       const SizedBox(height: 15),
-                      const Text('Medication name'),
+                      const Text('Dosage amount'),
                       TextFormField(
                         readOnly: !isEdit,
-                        controller: dmedNameController,
+                        controller: dosageController,
+                        keyboardType: TextInputType.number,
                         decoration: const InputDecoration(
                             floatingLabelStyle: TextStyle(
                               color: secondaryColor,
@@ -184,18 +234,16 @@ class _PatientTreatmentState extends State<PatientTreatment> {
                         validator: (value) {
                           if (value!.isEmpty) {
                             return 'This field cannot be empty';
-                          } else if (!value.isEmail) {
-                            return 'Invalid email provided';
                           }
                           return null;
                         },
                       ),
-
                       const SizedBox(height: 15),
-                      const Text('Medication name'),
+                      const Text('Every after (Hours)'),
                       TextFormField(
                         readOnly: !isEdit,
-                        controller: dmedNameController,
+                        controller: oftenController,
+                        keyboardType: TextInputType.number,
                         decoration: const InputDecoration(
                             floatingLabelStyle: TextStyle(
                               color: secondaryColor,
@@ -210,8 +258,30 @@ class _PatientTreatmentState extends State<PatientTreatment> {
                         validator: (value) {
                           if (value!.isEmpty) {
                             return 'This field cannot be empty';
-                          } else if (!value.isEmail) {
-                            return 'Invalid email provided';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 15),
+                      const Text('Remind start at'),
+                      TextFormField(
+                        readOnly: !isEdit,
+                        controller: timeController,
+                        keyboardType: TextInputType.datetime,
+                        decoration: const InputDecoration(
+                            floatingLabelStyle: TextStyle(
+                              color: secondaryColor,
+                              fontSize: defaultSize,
+                            ),
+                            focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: primaryColor),
+                            ),
+                            enabledBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: primaryColor),
+                            )),
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return 'This field cannot be empty';
                           }
                           return null;
                         },

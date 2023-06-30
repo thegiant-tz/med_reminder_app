@@ -37,7 +37,7 @@ class _AddTreatmentState extends State<AddTreatment> {
         return Future(() => false);
       },
       child: Scaffold(
-        backgroundColor: secondaryColor,
+        backgroundColor: white,
         body: SafeArea(
           child: SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
@@ -53,11 +53,11 @@ class _AddTreatmentState extends State<AddTreatment> {
                     width: double.infinity,
                     padding: const EdgeInsets.all(15),
                     decoration: const BoxDecoration(
-                      color: Color(0xff1a1a1a),
+                      color: white,
                     ),
                     child: const Text(
                       '1. What medication do you want to set the reminder for?',
-                      style: TextStyle(color: textColor),
+                      style: TextStyle(color: black),
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -66,8 +66,7 @@ class _AddTreatmentState extends State<AddTreatment> {
                     child: Column(
                       children: [
                         CupertinoTextField(
-                          style: const TextStyle(color: Colors.white60),
-                          placeholderStyle: const TextStyle(color: textColor2),
+                          style: const TextStyle(color: black),
                           decoration:
                               const BoxDecoration(color: Colors.transparent),
                           controller: medController,
@@ -78,13 +77,13 @@ class _AddTreatmentState extends State<AddTreatment> {
                           children: [
                             const Text(
                               'Select medication unit',
-                              style: TextStyle(color: Colors.white60),
+                              style: TextStyle(color: primaryColor),
                             ),
                             const Spacer(),
                             DropdownButton(
                               hint: Text(unit,
                                   style:
-                                      const TextStyle(color: Colors.white54)),
+                                      const TextStyle(color: black)),
                               items: unitList.map<DropdownMenuItem<String>>(
                                   (String value) {
                                 return DropdownMenuItem<String>(
@@ -108,11 +107,11 @@ class _AddTreatmentState extends State<AddTreatment> {
                     width: double.infinity,
                     padding: const EdgeInsets.all(15),
                     decoration: const BoxDecoration(
-                      color: Color(0xff1a1a1a),
+                      color: white,
                     ),
                     child: const Text(
                       '2. How often do you take this medication?',
-                      style: TextStyle(color: textColor),
+                      style: TextStyle(color: black),
                     ),
                   ),
                   Padding(
@@ -121,13 +120,13 @@ class _AddTreatmentState extends State<AddTreatment> {
                       children: [
                         const Text(
                           'Every after',
-                          style: TextStyle(color: Colors.white60),
+                          style: TextStyle(color: primaryColor),
                         ),
                         const Spacer(),
                         DropdownButton(
                           hint: Text(
                             often.toString(),
-                            style: const TextStyle(color: Colors.white54),
+                            style: const TextStyle(color: black),
                           ),
                           items:
                               oftenList.map<DropdownMenuItem<int>>((int value) {
@@ -150,19 +149,18 @@ class _AddTreatmentState extends State<AddTreatment> {
                     width: double.infinity,
                     padding: const EdgeInsets.all(15),
                     decoration: const BoxDecoration(
-                      color: Color(0xff1a1a1a),
+                      color: white,
                     ),
                     child: const Text(
                       '3. Dosage amount',
-                      style: TextStyle(color: textColor),
+                      style: TextStyle(color: black),
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8),
                     child: CupertinoTextField(
                       keyboardType: TextInputType.number,
-                      style: const TextStyle(color: Colors.white60),
-                      placeholderStyle: const TextStyle(color: textColor2),
+                      style: const TextStyle(color: black),
                       decoration:
                           const BoxDecoration(color: Colors.transparent),
                       controller: dosageController,
@@ -174,19 +172,18 @@ class _AddTreatmentState extends State<AddTreatment> {
                     width: double.infinity,
                     padding: const EdgeInsets.all(15),
                     decoration: const BoxDecoration(
-                      color: Color(0xff1a1a1a),
+                      color: white,
                     ),
                     child: const Text(
                       '4. Intake amount',
-                      style: TextStyle(color: textColor),
+                      style: TextStyle(color: black),
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8),
                     child: CupertinoTextField(
                       keyboardType: TextInputType.number,
-                      style: const TextStyle(color: Colors.white60),
-                      placeholderStyle: const TextStyle(color: textColor2),
+                      style: const TextStyle(color: black),
                       decoration:
                           const BoxDecoration(color: Colors.transparent),
                       controller: intakeController,
@@ -198,11 +195,11 @@ class _AddTreatmentState extends State<AddTreatment> {
                     width: double.infinity,
                     padding: const EdgeInsets.all(15),
                     decoration: const BoxDecoration(
-                      color: Color(0xff1a1a1a),
+                      color: white,
                     ),
                     child: const Text(
                       '5. What time do you want to be reminded?',
-                      style: TextStyle(color: textColor),
+                      style: TextStyle(color: black),
                     ),
                   ),
                   Container(
@@ -216,14 +213,12 @@ class _AddTreatmentState extends State<AddTreatment> {
                           //   hintStyle: TextStyle(color: Colors.white54),
                           //   labelStyle: TextStyle(color: Colors.white54)
                           // ),
-                          style: const TextStyle(color: Colors.white54),
+                          style: const TextStyle(color: black),
                           keyboardAppearance: Brightness.dark,
-                          type: DateTimePickerType.dateTimeSeparate,
+                          type: DateTimePickerType.time,
                           firstDate: DateTime.now(),
                           lastDate: DateTime(2100, 12, 31),
-                          initialValue: DateTime.now().toString(),
                           timeLabelText: 'Time',
-                          dateLabelText: 'Date',
                           onChanged: (dateTime) {
                             setState(() {
                               reminderStartAt = dateTime;
@@ -238,8 +233,8 @@ class _AddTreatmentState extends State<AddTreatment> {
                   const SizedBox(height: 30),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: textColor,
-                      foregroundColor: secondaryColor,
+                      backgroundColor: primaryColor,
+                      foregroundColor: white,
                     ),
                     onPressed: () {
                       showDialog(
@@ -247,15 +242,15 @@ class _AddTreatmentState extends State<AddTreatment> {
                           context: context,
                           builder: (context) {
                             return AlertDialog(
-                              backgroundColor: secondaryColor,
-                              surfaceTintColor: secondaryColor,
+                              backgroundColor: primaryColor,
+                              surfaceTintColor: primaryColor,
                               title: const Text(
                                 'Confirmation',
-                                style: TextStyle(color: textColor),
+                                style: TextStyle(color: orange),
                               ),
                               content: const Text(
                                 'Are you sure?',
-                                style: TextStyle(color: Colors.white54),
+                                style: TextStyle(color: white),
                               ),
                               actions: [
                                 TextButton(
@@ -265,7 +260,8 @@ class _AddTreatmentState extends State<AddTreatment> {
                                   child: const Text(
                                     'Cancel',
                                     style: TextStyle(
-                                      color: Color.fromARGB(184, 237, 110, 101),
+                                      color: Colors.red,
+                                      fontWeight: FontWeight.bold
                                     ),
                                   ),
                                 ),
@@ -286,7 +282,7 @@ class _AddTreatmentState extends State<AddTreatment> {
                                     );
 
                                     if (response['message'] == 'success') {
-                                      showNotification(response['data']);
+                                      // showNotification(response['data']);
                                       showSnackBar(context,
                                           text: 'Reminder added',
                                           backgroundColor: Colors.green);
@@ -307,7 +303,7 @@ class _AddTreatmentState extends State<AddTreatment> {
                                   child: const Text(
                                     'Yes, I\'m sure',
                                     style: TextStyle(
-                                      color: Color.fromARGB(255, 135, 193, 240),
+                                      color: orange,
                                     ),
                                   ),
                                 )

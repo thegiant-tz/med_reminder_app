@@ -115,22 +115,46 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
                   Visibility(
                     visible: isDoctor(),
                     child: ListView.builder(
-                      itemCount: 10,
+                      itemCount: reminders.length,
                       shrinkWrap: true,
                       physics: const BouncingScrollPhysics(),
                       itemBuilder: (context, index) {
+                        final user = reminders[index]['user'];
+                        final reminder = reminders[index];
+                        bool isApproved = reminder['status'] == 'Approved';
                         return ListTile(
-                          title: const Text('Patient Name'),
-                          subtitle:
-                              const Text('Panadol | 2 Pills | Every 6 hours'),
-                          trailing: const Text('09:39'),
-                          leading: const Icon(Icons.person_2_rounded),
+                          title: Row(
+                            children: [
+                              Expanded(child: Text(user['name'])),
+                              Badge(
+                                backgroundColor:
+                                    isApproved ? orange : Colors.red,
+                                label: Text(
+                                  reminder['status'],
+                                  style: TextStyle(
+                                    color: isApproved ? black : white,
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                          subtitle: Text(
+                              '${reminder['med_name']} | ${reminder['intake']} ${reminder['unit']} | Every ${reminder['often']} hours'),
+                          trailing: Text(formattedDateTime(
+                              DateTime.parse(reminder['created_at']),
+                              format: 'HH:mm')),
+                          leading: Icon(
+                            Icons.person_2_rounded,
+                            color: isApproved ? orange : primaryColor,
+                          ),
                           onTap: () {
-                            Get.to(
-                              () => const PatientTreatment(),
-                              transition: Transition.cupertino,
-                              duration: const Duration(milliseconds: 500),
-                            );
+                            Get.to(() => const PatientTreatment(),
+                                transition: Transition.cupertino,
+                                duration: const Duration(milliseconds: 500),
+                                arguments: {
+                                  'user': user,
+                                  'reminder': reminder
+                                });
                           },
                         );
                       },
@@ -165,12 +189,21 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
   }
 
   void initializedFunctions() async {
-    final reminder = await ReminderController.getReminders();
-    setState(() {
-      if (reminder['data'] != null) {
-        reminders = reminder['data'] as List;
-      }
-    });
+    if (isPatient()) {
+      final reminder = await ReminderController.getReminders();
+      setState(() {
+        if (reminder['data'] != null) {
+          reminders = reminder['data'] as List;
+        }
+      });
+    } else {
+      final reminder = await ReminderController.getPendingReminders();
+      setState(() {
+        if (reminder['data'] != null) {
+          reminders = reminder['data'] as List;
+        }
+      });
+    }
   }
 }
 
@@ -190,6 +223,7 @@ class _MyCardState extends State<MyCard> {
   bool isON = true;
   @override
   Widget build(BuildContext context) {
+    bool isApproved = widget.reminders['status'] == 'Approved';
     return Card(
       margin: const EdgeInsets.symmetric(
         horizontal: 5,
@@ -197,13 +231,13 @@ class _MyCardState extends State<MyCard> {
       ),
       shape: RoundedRectangleBorder(
         side: const BorderSide(
-          color: Color.fromARGB(255, 42, 40, 33),
+          color: primaryColor,
         ),
         borderRadius: BorderRadius.circular(5),
       ),
-      color: secondaryColor,
-      surfaceTintColor: appColor,
-      shadowColor: secondaryColor,
+      color: white,
+      surfaceTintColor: white,
+      shadowColor: primaryColor,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8),
         child: Padding(
@@ -215,26 +249,28 @@ class _MyCardState extends State<MyCard> {
                 children: [
                   Expanded(
                       child: Text(
-                    'Reminder is ${isON ? 'ON' : 'OFF'}',
-                    style: const TextStyle(color: textColor),
+                    'Reminder is ${isON && isApproved ? 'ON' : 'OFF'}',
+                    style: const TextStyle(
+                        color: primaryColor, fontWeight: FontWeight.bold),
                   )),
                   Transform.scale(
                     scale: 0.7,
                     child: Switch(
-                        activeColor: const Color.fromARGB(255, 211, 211, 211),
-                        activeTrackColor:
-                            const Color.fromARGB(255, 122, 163, 123),
-                        value: isON,
+                        activeColor: white,
+                        activeTrackColor: Colors.green,
+                        value: isON && isApproved,
                         onChanged: (value) {
-                          if (value) {
-                            showNotification(widget.reminders);
-                          } else {
-                            NotificationService.cancelNotification(
-                                id: widget.reminders['id']);
+                          if (isApproved) {
+                            if (value) {
+                              showNotification(widget.reminders);
+                            } else {
+                              NotificationService.cancelNotification(
+                                  id: widget.reminders['id']);
+                            }
+                            setState(() {
+                              isON = value;
+                            });
                           }
-                          setState(() {
-                            isON = value;
-                          });
                         }),
                   )
                 ],
@@ -244,12 +280,12 @@ class _MyCardState extends State<MyCard> {
                   const Expanded(
                     child: Text(
                       'Medication Name:',
-                      style: TextStyle(color: textColor2),
+                      style: TextStyle(color: primaryColor),
                     ),
                   ),
                   Text(
                     widget.reminders['med_name'],
-                    style: const TextStyle(color: textColor2),
+                    style: const TextStyle(color: black),
                   ),
                 ],
               ),
@@ -258,14 +294,14 @@ class _MyCardState extends State<MyCard> {
                   const Expanded(
                     child: Text(
                       'Often:',
-                      style: TextStyle(color: textColor2),
+                      style: TextStyle(color: primaryColor),
                     ),
                   ),
                   Text(
                     widget.reminders['often'] == 1
                         ? '${widget.reminders['often']} Hour'
                         : '${widget.reminders['often']} Hours',
-                    style: const TextStyle(color: textColor2),
+                    style: const TextStyle(color: black),
                   )
                 ],
               ),
@@ -274,50 +310,66 @@ class _MyCardState extends State<MyCard> {
                   const Expanded(
                     child: Text(
                       'Start at:',
-                      style: TextStyle(color: textColor2),
+                      style: TextStyle(color: primaryColor),
                     ),
                   ),
                   Text(
                     widget.reminders['start_at'],
-                    style: const TextStyle(color: textColor2),
+                    style: const TextStyle(color: black),
                   )
                 ],
               ),
               const Divider(
-                color: dividerColor,
+                color: primaryColor,
               ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: Center(
-                      child: Text(
-                        'Intake: ${widget.reminders['intake']} ${widget.reminders['unit']}',
-                        style: const TextStyle(
-                            color: summaryTextColor, fontSize: 10),
-                      ),
-                    ),
-                  ),
-                  // const Expanded(
-                  //   child: Center(
-                  //     child: Text(
-                  //       'Remains: - pills',
-                  //       style: TextStyle(color: summaryTextColor, fontSize: 10),
-                  //     ),
-                  //   ),
-                  // ),
-                  Expanded(
-                    child: Center(
-                      child: Text(
-                        'Dosage: ${widget.reminders['dosage']} ${widget.reminders['unit']}',
-                        style: const TextStyle(
-                          color: summaryTextColor,
-                          fontSize: 10,
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: const BoxDecoration(color: primaryColor),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: Center(
+                        child: Text(
+                          'Intake: ${widget.reminders['intake']} ${widget.reminders['unit']}',
+                          style: const TextStyle(color: white, fontSize: 10),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                    // const Expanded(
+                    //   child: Center(
+                    //     child: Text(
+                    //       'Remains: - pills',
+                    //       style: TextStyle(color: summaryTextColor, fontSize: 10),
+                    //     ),
+                    //   ),
+                    // ),
+                    Expanded(
+                      child: Center(
+                        child: Text(
+                          'Dosage: ${widget.reminders['dosage']} ${widget.reminders['unit']}',
+                          style: const TextStyle(
+                            color: white,
+                            fontSize: 10,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    Expanded(
+                      child: Center(
+                          child: Badge(
+                        backgroundColor: isApproved ? orange : Colors.red,
+                        label: isApproved
+                            ? const Text(
+                                'Approved',
+                                style: TextStyle(color: primaryColor),
+                              )
+                            : const Text('Pending'),
+                      )),
+                    ),
+                  ],
+                ),
               )
             ],
           ),

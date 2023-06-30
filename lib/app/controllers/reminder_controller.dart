@@ -8,4 +8,11 @@ class ReminderController {
     );
     return response;
   }
+
+  static Future getPendingReminders() async {
+    final response = await NetworkController.fetch(
+      Uri.parse('$baseUrl/get-pending-Patients')
+    );
+    return response;
+  }
 }
