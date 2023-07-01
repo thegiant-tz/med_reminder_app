@@ -1,7 +1,12 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:medication_reminder_app/app/controllers/network_controller.dart';
 import 'package:medication_reminder_app/app/helpers/color_helper.dart';
+import 'package:medication_reminder_app/app/helpers/general_helper.dart';
 import 'package:medication_reminder_app/app/helpers/size_helper.dart';
+import 'package:medication_reminder_app/resources/view/screens/home_screens/treatment_screen.dart';
 
 class PatientTreatment extends StatefulWidget {
   const PatientTreatment({super.key});
@@ -59,78 +64,119 @@ class _PatientTreatmentState extends State<PatientTreatment> {
                 Visibility(
                   visible: isApproved,
                   child: const Badge(
-                    label: Text('Approved', style: TextStyle(color: black),),
+                    label: Text(
+                      'Approved',
+                      style: TextStyle(color: black),
+                    ),
                     backgroundColor: orange,
                   ),
                 )
               ],
             ),
             backgroundColor: primaryColor,
-            actions: isApproved ? null : [
-              TextButton(
-                onPressed: () {
-                  setState(() {
-                    isEdit = true;
-                  });
-                },
-                child: const Row(
-                  children: [
-                    Icon(
-                      Icons.edit,
-                      color: white,
-                      size: 14,
-                    ),
-                    SizedBox(width: 5),
-                    Text(
-                      'Edit',
-                      style: TextStyle(color: white),
-                    ),
-                  ],
-                ),
-              ),
-              TextButton(
-                onPressed: () {
-                  if (formKey.currentState!.validate()) {
-                    showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          title: const Text('Confirmation'),
-                          content: const Text('Are you sure?'),
-                          actions: [
-                            TextButton(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                                child: const Text(
-                                  'Cancel',
-                                  style: TextStyle(color: Colors.red),
-                                )),
-                            TextButton(
-                                onPressed: () {},
-                                child: const Text('Yes I\'m sure')),
-                          ],
-                        );
+            actions: isApproved
+                ? null
+                : [
+                    TextButton(
+                      onPressed: () {
+                        setState(() {
+                          isEdit = true;
+                        });
                       },
-                    );
-                  }
-                },
-                child: const Row(
-                  children: [
-                    Icon(
-                      Icons.check_circle_outline_outlined,
-                      color: white,
-                      size: 14,
+                      child: const Row(
+                        children: [
+                          Icon(
+                            Icons.edit,
+                            color: white,
+                            size: 14,
+                          ),
+                          SizedBox(width: 5),
+                          Text(
+                            'Edit',
+                            style: TextStyle(color: white),
+                          ),
+                        ],
+                      ),
                     ),
-                    SizedBox(width: 5),
-                    Text(
-                      'Confirm',
-                      style: TextStyle(color: white),
+                    TextButton(
+                      onPressed: () {
+                        if (formKey.currentState!.validate()) {
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                title: const Text('Confirmation'),
+                                content: const Text('Are you sure?'),
+                                actions: [
+                                  TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: const Text(
+                                        'Cancel',
+                                        style: TextStyle(color: Colors.red),
+                                      )),
+                                  TextButton(
+                                      onPressed: () async {
+                                        final response =
+                                            await NetworkController.post(
+                                          Uri.parse(
+                                            '$baseUrl/reminder-confirmation',
+                                          ),
+                                          body: {
+                                            'id': reminder['id'].toString()
+                                          },
+                                        );
+                                        if (response != null) {
+                                          if (response['message'] ==
+                                              'success') {
+                                            Get.to(
+                                              () => const TreatmentScreen(),
+                                              transition: Transition.fadeIn,
+                                            );
+                                            showSnackBar(
+                                              context,
+                                              text: 'Reminder approved',
+                                              backgroundColor: Colors.green,
+                                            );
+                                          } else {
+                                            showSnackBar(
+                                              context,
+                                              text: 'Approval failed',
+                                              backgroundColor: Colors.red,
+                                            );
+                                          }
+                                        } else {
+                                          showSnackBar(
+                                            context,
+                                            text: 'Approval failed',
+                                            backgroundColor: Colors.red,
+                                          );
+                                        }
+                                      },
+                                      child: const Text('Yes I\'m sure')),
+                                ],
+                              );
+                            },
+                          );
+                        }
+                      },
+                      child: const Row(
+                        children: [
+                          Icon(
+                            Icons.check_circle_outline_outlined,
+                            color: white,
+                            size: 14,
+                          ),
+                          SizedBox(width: 5),
+                          Text(
+                            'Confirm',
+                            style: TextStyle(color: white),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
-                ),
-              ),
-            ],
           ),
           SliverToBoxAdapter(
             child: Padding(

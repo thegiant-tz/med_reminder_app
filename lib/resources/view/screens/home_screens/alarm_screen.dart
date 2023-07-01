@@ -3,6 +3,7 @@ import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:flutter_shake_animated/flutter_shake_animated.dart';
 import 'package:get/get.dart';
 import 'package:medication_reminder_app/app/helpers/color_helper.dart';
+import 'package:medication_reminder_app/app/helpers/general_helper.dart';
 import 'package:medication_reminder_app/resources/view/screens/home_screens/treatment_screen.dart';
 
 class AlarmDisplayScreen extends StatefulWidget {
@@ -61,13 +62,14 @@ class _AlarmDisplayScreenState extends State<AlarmDisplayScreen> {
                   TextButton(
                     onPressed: () {
                       FlutterRingtonePlayer.stop();
+                      // showNotification(response)
                       Get.to(
                         () => const TreatmentScreen(),
                         transition: Transition.fade,
                       );
                     },
                     child: const Text(
-                      '10 minutes later',
+                      '2 minutes later',
                       style: TextStyle(color: Colors.red),
                     ),
                   ),

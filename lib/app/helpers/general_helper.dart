@@ -94,14 +94,18 @@ void showSnackBar(
 }
 
 void showNotification(response) {
+  final date = formattedDateTime(DateTime.now(), format: 'yyyy-MM-dd') +
+      ' ' +
+      response['start_at'];
+ 
   NotificationService.showNotification(
     id: response['id'],
     title: 'Medication Reminder',
     body:
         'Habari, Muda wa kumeza dawa umewadia, Hakikisha unaweza dawa kwa wakati',
     scheduled: true,
-    fromDate: DateTime.now(),
-    interval: 10,
+    fromDate: DateTime.parse(date),
+    interval: response['often'] * 60,
   );
 }
 

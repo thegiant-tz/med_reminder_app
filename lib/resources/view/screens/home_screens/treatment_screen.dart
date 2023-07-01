@@ -1,9 +1,11 @@
-// ignore_for_file: must_be_immutable
+// ignore_for_file: must_be_immutable, use_build_context_synchronously
 
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:medication_reminder_app/app/controllers/network_controller.dart';
 import 'package:medication_reminder_app/app/controllers/reminder_controller.dart';
 import 'package:medication_reminder_app/app/helpers/color_helper.dart';
 import 'package:medication_reminder_app/app/helpers/general_helper.dart';
@@ -36,141 +38,252 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
       child: WillPopScope(
         onWillPop: () => Future(() => false),
         child: SafeArea(
-          child: Scaffold(
-            backgroundColor: white,
-            appBar: const CupertinoNavigationBar(
-              middle: Text(
-                'MEDICATION REMINDER',
-                style: TextStyle(color: white),
-              ),
-              trailing: Icon(
-                Icons.power_settings_new,
-                size: 18,
-                color: orange,
-              ),
-              automaticallyImplyLeading: false,
-              backgroundColor: primaryColor,
+          child: AnnotatedRegion<SystemUiOverlayStyle>(
+            value: const SystemUiOverlayStyle(
+              systemNavigationBarColor: primaryColor,
+              systemNavigationBarIconBrightness: Brightness.light,
+              statusBarColor: primaryColor,
+              statusBarIconBrightness: Brightness.light,
             ),
-            floatingActionButton: isDoctor()
-                ? null
-                : ElevatedButton.icon(
-                    onPressed: () {
-                      Get.to(() => const AddTreatment(),
-                          transition: Transition.cupertino,
-                          duration: const Duration(microseconds: 1000));
-                    },
-                    icon: const Icon(Icons.alarm_add),
-                    label: const Text(
-                      'Add Reminder',
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: primaryColor,
-                      foregroundColor: white,
-                    ),
-                  ),
-            body: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              child: Column(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: const BoxDecoration(color: primaryColor),
-                    child: Row(
-                      children: [
-                        Icon(
-                          isDoctor() ? Icons.people_sharp : Icons.alarm,
-                          size: 20,
-                          color: orange,
-                        ),
-                        const SizedBox(
-                          width: 8,
-                        ),
-                        GestureDetector(
-                          onTap: () async {
-                            initializedFunctions();
-                          },
-                          child: Text(
-                            isDoctor() ? 'PATIENTS' : 'REMINDERS',
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: white,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Visibility(
-                    visible: isPatient(),
-                    child: ListView.builder(
-                      itemCount: reminders.length,
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemBuilder: (context, index) {
-                        return MyCard(reminders: reminders[index]);
+            child: Scaffold(
+              backgroundColor: white,
+              appBar: const CupertinoNavigationBar(
+                middle: Text(
+                  'MEDICATION REMINDER',
+                  style: TextStyle(color: white),
+                ),
+                trailing: Icon(
+                  Icons.power_settings_new,
+                  size: 18,
+                  color: orange,
+                ),
+                automaticallyImplyLeading: false,
+                backgroundColor: primaryColor,
+              ),
+              floatingActionButton: isDoctor()
+                  ? null
+                  : ElevatedButton.icon(
+                      onPressed: () {
+                        Get.to(() => const AddTreatment(),
+                            transition: Transition.cupertino,
+                            duration: const Duration(microseconds: 1000));
                       },
-                    ),
-                  ),
-                  Visibility(
-                    visible: isDoctor(),
-                    child: ListView.builder(
-                      itemCount: reminders.length,
-                      shrinkWrap: true,
-                      physics: const BouncingScrollPhysics(),
-                      itemBuilder: (context, index) {
-                        final user = reminders[index]['user'];
-                        final reminder = reminders[index];
-                        bool isApproved = reminder['status'] == 'Approved';
-                        return ListTile(
-                          title: Row(
-                            children: [
-                              Expanded(child: Text(user['name'])),
-                              Badge(
-                                backgroundColor:
-                                    isApproved ? orange : Colors.red,
-                                label: Text(
-                                  reminder['status'],
-                                  style: TextStyle(
-                                    color: isApproved ? black : white,
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                          subtitle: Text(
-                              '${reminder['med_name']} | ${reminder['intake']} ${reminder['unit']} | Every ${reminder['often']} hours'),
-                          trailing: Text(formattedDateTime(
-                              DateTime.parse(reminder['created_at']),
-                              format: 'HH:mm')),
-                          leading: Icon(
-                            Icons.person_2_rounded,
-                            color: isApproved ? orange : primaryColor,
-                          ),
-                          onTap: () {
-                            Get.to(() => const PatientTreatment(),
-                                transition: Transition.cupertino,
-                                duration: const Duration(milliseconds: 500),
-                                arguments: {
-                                  'user': user,
-                                  'reminder': reminder
-                                });
-                          },
-                        );
-                      },
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Center(
-                    child: Text(
-                      '${reminders.length} reminders',
-                      style: const TextStyle(
-                        color: Colors.white54,
-                        fontSize: 10,
+                      icon: const Icon(Icons.alarm_add),
+                      label: const Text(
+                        'Add Reminder',
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryColor,
+                        foregroundColor: white,
                       ),
                     ),
-                  )
-                ],
+              body: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: const BoxDecoration(color: primaryColor),
+                      child: Row(
+                        children: [
+                          Icon(
+                            isDoctor() ? Icons.people_sharp : Icons.alarm,
+                            size: 20,
+                            color: orange,
+                          ),
+                          const SizedBox(
+                            width: 8,
+                          ),
+                          GestureDetector(
+                            onTap: () async {
+                              initializedFunctions();
+                            },
+                            child: Text(
+                              isDoctor() ? 'PATIENTS' : 'REMINDERS',
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: white,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Visibility(
+                      visible: isPatient(),
+                      child: ListView.builder(
+                        itemCount: reminders.length,
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemBuilder: (context, index) {
+                          return PopupMenuButton(
+                            color: primaryColor,
+                            onSelected: (value) {
+                              if (value == 'refill') {
+                                TextEditingController refillController =
+                                    TextEditingController(
+                                        text: reminders[index]['dosage']
+                                            .toString());
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      title: const Text('REFILL'),
+                                      content: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const Text('Amount'),
+                                          const SizedBox(height: 8),
+                                          CupertinoTextField(
+                                            controller: refillController,
+                                            keyboardType: TextInputType.number,
+                                            placeholder: 'Type here ...',
+                                          )
+                                        ],
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          child: const Text(
+                                            'Cancel',
+                                            style: TextStyle(color: Colors.red),
+                                          ),
+                                        ),
+                                        TextButton(
+                                          onPressed: () async {
+                                            if (refillController
+                                                .text.isNotEmpty) {
+                                              Uri uri =
+                                                  Uri.parse('$baseUrl/refill');
+                                              final body = {
+                                                'amount': refillController.text,
+                                                'id': reminders[index]['id']
+                                                    .toString()
+                                              };
+                                              final response =
+                                                  await NetworkController.post(
+                                                uri,
+                                                body: body,
+                                              );
+
+                                              if (response != null) {
+                                                if (response['message'] ==
+                                                    'success') {
+                                                  Navigator.pop(context);
+                                                  initializedFunctions();
+                                                  showSnackBar(context,
+                                                      text: 'Reminder refilled',
+                                                      backgroundColor:
+                                                          Colors.green);
+                                                } else {
+                                                  Navigator.pop(context);
+                                                  showSnackBar(context,
+                                                      text: 'Refill failed',
+                                                      backgroundColor:
+                                                          Colors.red);
+                                                }
+                                              } else {
+                                                Navigator.pop(context);
+                                                showSnackBar(context,
+                                                    text: 'Refill failed',
+                                                    backgroundColor:
+                                                        Colors.red);
+                                              }
+                                            }
+                                          },
+                                          child: const Text(
+                                            'Refill',
+                                            style:
+                                                TextStyle(color: Colors.blue),
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              }
+                            },
+                            position: PopupMenuPosition.under,
+                            itemBuilder: (context) {
+                              return <PopupMenuEntry>[
+                                const PopupMenuItem(
+                                    value: 'refill',
+                                    child: Text(
+                                      'Refill',
+                                      style: TextStyle(color: white),
+                                    )),
+                              ];
+                            },
+                            child: MyCard(reminders: reminders[index]),
+                          );
+                        },
+                      ),
+                    ),
+                    Visibility(
+                      visible: isDoctor(),
+                      child: ListView.builder(
+                        itemCount: reminders.length,
+                        shrinkWrap: true,
+                        physics: const BouncingScrollPhysics(),
+                        itemBuilder: (context, index) {
+                          final user = reminders[index]['user'];
+                          final reminder = reminders[index];
+                          bool isApproved = reminder['status'] == 'Approved';
+                          return ListTile(
+                            title: Row(
+                              children: [
+                                Expanded(child: Text(user['name'])),
+                                Badge(
+                                  backgroundColor:
+                                      isApproved ? orange : Colors.red,
+                                  label: Text(
+                                    reminder['status'],
+                                    style: TextStyle(
+                                      color: isApproved ? black : white,
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                            subtitle: Text(
+                                '${reminder['med_name']} | ${reminder['intake']} ${reminder['unit']} | Every ${reminder['often']} hours'),
+                            trailing: Text(formattedDateTime(
+                                DateTime.parse(reminder['created_at']),
+                                format: 'HH:mm')),
+                            leading: Icon(
+                              Icons.person_2_rounded,
+                              color: isApproved ? orange : primaryColor,
+                            ),
+                            onTap: () {
+                              Get.to(() => const PatientTreatment(),
+                                  transition: Transition.cupertino,
+                                  duration: const Duration(milliseconds: 500),
+                                  arguments: {
+                                    'user': user,
+                                    'reminder': reminder
+                                  });
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Center(
+                      child: Text(
+                        '${reminders.length} reminders',
+                        style: const TextStyle(
+                          color: Colors.white54,
+                          fontSize: 10,
+                        ),
+                      ),
+                    )
+                  ],
+                ),
               ),
             ),
           ),
@@ -220,10 +333,13 @@ class MyCard extends StatefulWidget {
 }
 
 class _MyCardState extends State<MyCard> {
-  bool isON = true;
+  bool isON = false;
   @override
   Widget build(BuildContext context) {
     bool isApproved = widget.reminders['status'] == 'Approved';
+    if (isApproved && isON) {
+      showNotification(widget.reminders);
+    }
     return Card(
       margin: const EdgeInsets.symmetric(
         horizontal: 5,
