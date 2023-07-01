@@ -251,7 +251,7 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
                               ],
                             ),
                             subtitle: Text(
-                                '${reminder['med_name']} | ${reminder['intake']} ${reminder['unit']} | Every ${reminder['often']} hours'),
+                                '${reminder['med_name']} | ${reminder['intake']} ${reminder['unit']} | Every ${reminder['often']} minutes'),
                             trailing: Text(formattedDateTime(
                                 DateTime.parse(reminder['created_at']),
                                 format: 'HH:mm')),
@@ -270,6 +270,13 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
                             },
                           );
                         },
+                      ),
+                    ),
+                    Visibility(
+                      visible: reminders.isEmpty,
+                      child: const Padding(
+                        padding: EdgeInsets.all(15.0),
+                        child: Text('No reminder found'),
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -307,6 +314,8 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
       setState(() {
         if (reminder['data'] != null) {
           reminders = reminder['data'] as List;
+        } else {
+          reminders = [];
         }
       });
     } else {
@@ -314,6 +323,8 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
       setState(() {
         if (reminder['data'] != null) {
           reminders = reminder['data'] as List;
+        } else {
+          reminders = [];
         }
       });
     }
@@ -337,9 +348,9 @@ class _MyCardState extends State<MyCard> {
   @override
   Widget build(BuildContext context) {
     bool isApproved = widget.reminders['status'] == 'Approved';
-    if (isApproved && isON) {
-      showNotification(widget.reminders);
-    }
+    // setState(() {
+    //   isON = widget.reminders['switch_state'].toString() == "1";
+    // });
     return Card(
       margin: const EdgeInsets.symmetric(
         horizontal: 5,
@@ -383,6 +394,7 @@ class _MyCardState extends State<MyCard> {
                               NotificationService.cancelNotification(
                                   id: widget.reminders['id']);
                             }
+
                             setState(() {
                               isON = value;
                             });
@@ -415,8 +427,8 @@ class _MyCardState extends State<MyCard> {
                   ),
                   Text(
                     widget.reminders['often'] == 1
-                        ? '${widget.reminders['often']} Hour'
-                        : '${widget.reminders['often']} Hours',
+                        ? '${widget.reminders['often']} Minute'
+                        : '${widget.reminders['often']} Minutes',
                     style: const TextStyle(color: black),
                   )
                 ],

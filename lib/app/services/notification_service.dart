@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
@@ -61,7 +63,9 @@ class NotificationService {
       onNotificationDisplayedMethod: (receivedNotification) async {
         debugPrint('onNotificationDisplayedMethod');
         FlutterRingtonePlayer.playAlarm();
-        Get.to(() => const AlarmDisplayScreen(), transition: Transition.fadeIn);
+        final payload = receivedNotification.payload;
+        Get.to(() => const AlarmDisplayScreen(),
+            transition: Transition.fadeIn, arguments: {'payload': payload});
       },
       onDismissActionReceivedMethod: (receivedAction) async {
         FlutterRingtonePlayer.stop();

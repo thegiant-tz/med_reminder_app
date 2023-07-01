@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -93,19 +95,23 @@ void showSnackBar(
   );
 }
 
-void showNotification(response) {
+void showNotification(reminder, {int snooze = 2, bool isSnoozed = false}) {
   final date = formattedDateTime(DateTime.now(), format: 'yyyy-MM-dd') +
       ' ' +
-      response['start_at'];
+      reminder['start_at'];
  
   NotificationService.showNotification(
-    id: response['id'],
+    id: reminder['id'],
     title: 'Medication Reminder',
     body:
         'Habari, Muda wa kumeza dawa umewadia, Hakikisha unaweza dawa kwa wakati',
     scheduled: true,
-    fromDate: DateTime.parse(date),
-    interval: response['often'] * 60,
+    fromDate:  isSnoozed ? DateTime.now() : DateTime.parse(date),
+    interval: isSnoozed ? snooze : reminder['often'] * 60,
+    payload: {
+      'payload' : "true",
+      'reminder': jsonEncode(reminder)
+    }
   );
 }
 
