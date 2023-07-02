@@ -234,10 +234,10 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
                             position: PopupMenuPosition.under,
                             itemBuilder: (context) {
                               return <PopupMenuEntry>[
-                                const PopupMenuItem(
+                                 PopupMenuItem(
                                   value: 'info',
                                   child: Row(
-                                    children: [
+                                    children: const [
                                       Icon(
                                         Icons.info_outline,
                                         size: 14,
@@ -251,10 +251,10 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
                                     ],
                                   ),
                                 ),
-                                const PopupMenuItem(
+                                PopupMenuItem(
                                   value: 'refill',
                                   child: Row(
-                                    children: [
+                                    children: const [
                                       Icon(
                                         Icons.add_circle_outline_outlined,
                                         size: 14,
