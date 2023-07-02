@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:medication_reminder_app/app/controllers/network_controller.dart';
 import 'package:medication_reminder_app/app/controllers/reminder_controller.dart';
 import 'package:medication_reminder_app/app/helpers/color_helper.dart';
@@ -47,15 +48,27 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
             ),
             child: Scaffold(
               backgroundColor: white,
-              appBar: const CupertinoNavigationBar(
-                middle: Text(
+              appBar: CupertinoNavigationBar(
+                middle: const Text(
                   'MEDICATION REMINDER',
                   style: TextStyle(color: white),
                 ),
-                trailing: Icon(
-                  Icons.power_settings_new,
-                  size: 18,
-                  color: orange,
+                trailing: GestureDetector(
+                  onTap: () {
+                    alertDialog(
+                      context,
+                      title: const Text('Logout'),
+                      content: const Text('Are you sure?'),
+                      onConfirm: () {
+                        logout();
+                      },
+                    );
+                  },
+                  child: const Icon(
+                    Icons.power_settings_new,
+                    size: 18,
+                    color: orange,
+                  ),
                 ),
                 automaticallyImplyLeading: false,
                 backgroundColor: primaryColor,
@@ -206,17 +219,55 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
                                     );
                                   },
                                 );
+                              } else if (value == 'info') {
+                                Get.to(
+                                  () => const PatientTreatment(),
+                                  transition: Transition.circularReveal,
+                                  duration: const Duration(milliseconds: 500),
+                                  arguments: {
+                                    'reminder': reminders[index],
+                                    'user': GetStorage().read('user')
+                                  }
+                                );
                               }
                             },
                             position: PopupMenuPosition.under,
                             itemBuilder: (context) {
                               return <PopupMenuEntry>[
                                 const PopupMenuItem(
-                                    value: 'refill',
-                                    child: Text(
-                                      'Refill',
-                                      style: TextStyle(color: white),
-                                    )),
+                                  value: 'info',
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.info_outline,
+                                        size: 14,
+                                        color: orange,
+                                      ),
+                                      SizedBox(width: 8),
+                                      Text(
+                                        'Info',
+                                        style: TextStyle(color: white),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const PopupMenuItem(
+                                  value: 'refill',
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.add_circle_outline_outlined,
+                                        size: 14,
+                                        color: orange,
+                                      ),
+                                      SizedBox(width: 8),
+                                      Text(
+                                        'Refill',
+                                        style: TextStyle(color: white),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ];
                             },
                             child: MyCard(reminders: reminders[index]),

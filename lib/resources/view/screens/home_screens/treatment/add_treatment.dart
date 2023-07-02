@@ -119,7 +119,7 @@ class _AddTreatmentState extends State<AddTreatment> {
                     child: Row(
                       children: [
                         const Text(
-                          'Every after',
+                          'Every after (Minutes)',
                           style: TextStyle(color: primaryColor),
                         ),
                         const Spacer(),
@@ -231,6 +231,29 @@ class _AddTreatmentState extends State<AddTreatment> {
                     ),
                   ),
                   const SizedBox(height: 30),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(15),
+                    decoration: const BoxDecoration(
+                      color: white,
+                    ),
+                    child: const Text(
+                      '6. Descriptions',
+                      style: TextStyle(color: black),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: CupertinoTextField(
+                      style: const TextStyle(color: black),
+                      decoration:
+                          const BoxDecoration(color: Colors.transparent),
+                      controller: descriptionController,
+                      maxLines: 2,
+                      placeholder: 'Type here ..',
+                    ),
+                  ),
+                  const SizedBox(height: 30),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: primaryColor,
@@ -273,7 +296,8 @@ class _AddTreatmentState extends State<AddTreatment> {
                                       'often': often.toString(),
                                       'dosage': dosageController.text,
                                       'intake': intakeController.text,
-                                      'start_at': reminderStartAt
+                                      'start_at': reminderStartAt,
+                                      'description': descriptionController.text
                                     };
                                     final response =
                                         await NetworkController.post(

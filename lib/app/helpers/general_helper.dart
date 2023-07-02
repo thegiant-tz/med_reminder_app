@@ -5,9 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
+import 'package:medication_reminder_app/app/controllers/network_controller.dart';
 import 'package:medication_reminder_app/app/helpers/color_helper.dart';
 import 'package:medication_reminder_app/app/services/notification_service.dart';
 import 'package:medication_reminder_app/resources/view/screens/home_screens/treatment_screen.dart';
+import 'package:medication_reminder_app/resources/view/screens/signin_screen.dart';
 
 printHello() {
   final DateTime now = DateTime.now();
@@ -99,20 +101,16 @@ void showNotification(reminder, {int snooze = 2, bool isSnoozed = false}) {
   final date = formattedDateTime(DateTime.now(), format: 'yyyy-MM-dd') +
       ' ' +
       reminder['start_at'];
- 
+
   NotificationService.showNotification(
-    id: reminder['id'],
-    title: 'Medication Reminder',
-    body:
-        'Habari, Muda wa kumeza dawa umewadia, Hakikisha unaweza dawa kwa wakati',
-    scheduled: true,
-    fromDate:  isSnoozed ? DateTime.now() : DateTime.parse(date),
-    interval: isSnoozed ? snooze : reminder['often'] * 60,
-    payload: {
-      'payload' : "true",
-      'reminder': jsonEncode(reminder)
-    }
-  );
+      id: reminder['id'],
+      title: 'Medication Reminder',
+      body: reminder['description'] ??
+          'Habari, Muda wa kumeza dawa umewadia, Hakikisha unaweza dawa kwa wakati',
+      scheduled: true,
+      fromDate: isSnoozed ? DateTime.now() : DateTime.parse(date),
+      interval: isSnoozed ? snooze : reminder['often'] * 60,
+      payload: {'payload': "true", 'reminder': jsonEncode(reminder)});
 }
 
 const List<int> oftenList = <int>[
@@ -144,3 +142,53 @@ const List<int> oftenList = <int>[
 
 const baseUrl = 'http://192.168.73.43:8000/api';
 const headers = {'Accept': 'application/json'};
+
+void logout() async {
+  final response = await NetworkController.fetch(Uri.parse('$baseUrl/logout'));
+  if (response != null) {
+    if (response['message'] == 'logged out') {
+      box.erase();
+      Get.to(() => const SignInScreen(), transition: Transition.fadeIn);
+    }
+  }
+}
+
+alertDialog(
+  BuildContext context, {
+  Widget? title,
+  Widget? content,
+  void Function()? onCancel,
+  void Function()? onConfirm,
+}) {
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: title,
+        content: content,
+        actions: [
+          TextButton(
+            onPressed: onCancel ??
+                () {
+                  Navigator.pop(context);
+                },
+            child: const Text(
+              'Cancel',
+              style: TextStyle(color: Colors.red),
+            ),
+          ),
+          TextButton(
+            onPressed: onConfirm ??
+                () {
+                  Navigator.pop(context);
+                },
+            child: const Text(
+              'Yes, I\'m sure',
+              style: TextStyle(color: Colors.blue),
+            ),
+          ),
+        ],
+      );
+    },
+  );
+}

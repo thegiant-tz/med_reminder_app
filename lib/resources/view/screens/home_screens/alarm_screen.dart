@@ -76,6 +76,22 @@ class _AlarmDisplayScreenState extends State<AlarmDisplayScreen> {
                   ],
                 ),
                 const SizedBox(height: 20),
+                const Text(
+                  'Descriptions',
+                  style: TextStyle(
+                    color: textColor,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  reminder['description'],
+                  style: const TextStyle(
+                    color: textColor,
+                    fontSize: 16,
+                  ),
+                ),
+                const SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -100,6 +116,7 @@ class _AlarmDisplayScreenState extends State<AlarmDisplayScreen> {
                     const SizedBox(width: 10),
                     TextButton(
                       onPressed: () async {
+                        FlutterRingtonePlayer.stop();
                         Uri uri = Uri.parse('$baseUrl/confirm-alarm');
                         final body = {
                           'intake': reminder['intake'].toString(),

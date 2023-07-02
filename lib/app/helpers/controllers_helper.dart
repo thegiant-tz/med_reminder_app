@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 TextEditingController dateTimePickerController = TextEditingController();
 TextEditingController dosageController = TextEditingController();
 TextEditingController intakeController = TextEditingController();
+TextEditingController descriptionController = TextEditingController();
+
 
 
 TextEditingController emailController = TextEditingController();
