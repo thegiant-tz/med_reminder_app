@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, prefer_const_constructors
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -85,8 +85,8 @@ class _PatientTreatmentState extends State<PatientTreatment> {
                               isEdit = true;
                             });
                           },
-                          child: const Row(
-                            children: [
+                          child: Row(
+                            children: const [
                               Icon(
                                 Icons.edit,
                                 color: white,
@@ -169,8 +169,8 @@ class _PatientTreatmentState extends State<PatientTreatment> {
                               );
                             }
                           },
-                          child: const Row(
-                            children: [
+                          child: Row(
+                            children: const [
                               Icon(
                                 Icons.check_circle_outline_outlined,
                                 color: white,
