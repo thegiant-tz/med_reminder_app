@@ -62,6 +62,7 @@ class NotificationService {
         debugPrint('onNotificationDisplayedMethod');
         FlutterRingtonePlayer.playAlarm();
         final payload = receivedNotification.payload;
+        print(payload);
         Get.to(() => const AlarmDisplayScreen(),
             transition: Transition.fadeIn, arguments: {'payload': payload});
       },

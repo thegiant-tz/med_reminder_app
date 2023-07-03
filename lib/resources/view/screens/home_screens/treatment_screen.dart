@@ -343,6 +343,7 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
                         itemBuilder: (context, index) {
                           final user = reminders[index]['user'];
                           final reminder = reminders[index];
+                          reminder['index'] = index;
                           bool isApproved = reminder['status'] == 'Approved';
                           return ListTile(
                             title: Row(

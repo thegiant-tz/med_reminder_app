@@ -13,7 +13,6 @@ import 'package:medication_reminder_app/resources/view/screens/signin_screen.dar
 
 printHello() {
   final DateTime now = DateTime.now();
-  print("[$now] Alarm triggered!");
 }
 
 final box = GetStorage();
@@ -105,7 +104,7 @@ void showNotification(reminder, {int snooze = 2, bool isSnoozed = false}) {
           'Habari, Muda wa kumeza dawa umewadia, Hakikisha unaweza dawa kwa wakati',
       scheduled: true,
       fromDate: DateTime.now(),
-      interval: isSnoozed ? snooze : reminder['often'] * 60,
+      interval: 5, //isSnoozed ? snooze : reminder['often'] * 60,
       payload: {'payload': "true", 'reminder': jsonEncode(reminder)});
 }
 

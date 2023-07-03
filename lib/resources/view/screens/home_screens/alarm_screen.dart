@@ -8,6 +8,7 @@ import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:flutter_shake_animated/flutter_shake_animated.dart';
 import 'package:get/get.dart';
 import 'package:medication_reminder_app/app/controllers/network_controller.dart';
+import 'package:medication_reminder_app/app/controllers/reminder_controller.dart';
 import 'package:medication_reminder_app/app/helpers/color_helper.dart';
 import 'package:medication_reminder_app/app/helpers/general_helper.dart';
 import 'package:medication_reminder_app/resources/view/screens/home_screens/treatment_screen.dart';
@@ -136,13 +137,20 @@ class _AlarmDisplayScreenState extends State<AlarmDisplayScreen> {
 
                               if (response != null) {
                                 if (response['message'] == 'success') {
-                                  Get.to(() => const TreatmentScreen(),
-                                      transition: Transition.fadeIn,
-                                      arguments: {'reminder': reminder});
+                                  
+                                  final newReminder =
+                                      await ReminderController.getReminders(
+                                          id: reminder['id']);
                                   showNotification(
-                                    reminder,
+                                    newReminder['data'],
                                     isSnoozed: true,
                                     snooze: reminder['often'] * 60,
+                                  );
+                                  
+                                  Get.to(
+                                    () => const TreatmentScreen(),
+                                    transition: Transition.fadeIn,
+                                    arguments: {'reminder': reminder},
                                   );
                                 }
                               }
@@ -179,7 +187,8 @@ class _AlarmDisplayScreenState extends State<AlarmDisplayScreen> {
                   child: Visibility(
                     visible: isPatient() && isAlertEnabled(reminder)['status'],
                     child: Container(
-                      padding: EdgeInsets.symmetric(vertical: 15, horizontal: 8),
+                      padding:
+                          EdgeInsets.symmetric(vertical: 15, horizontal: 8),
                       decoration: BoxDecoration(
                           color: const Color.fromARGB(255, 177, 88, 82),
                           borderRadius: BorderRadius.circular(8)),
