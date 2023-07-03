@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors, duplicate_ignore
+
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -91,6 +93,7 @@ class _AlarmDisplayScreenState extends State<AlarmDisplayScreen> {
                     fontSize: 16,
                   ),
                 ),
+
                 const SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -106,6 +109,7 @@ class _AlarmDisplayScreenState extends State<AlarmDisplayScreen> {
                         Get.to(
                           () => const TreatmentScreen(),
                           transition: Transition.fade,
+                          arguments: {'reminder': reminder},
                         );
                       },
                       child: const Text(
@@ -114,41 +118,43 @@ class _AlarmDisplayScreenState extends State<AlarmDisplayScreen> {
                       ),
                     ),
                     const SizedBox(width: 10),
-                    TextButton(
-                      onPressed: () async {
-                        FlutterRingtonePlayer.stop();
-                        Uri uri = Uri.parse('$baseUrl/confirm-alarm');
-                        final body = {
-                          'intake': reminder['intake'].toString(),
-                          'id': reminder['id'].toString()
-                        };
-                        final response = await NetworkController.post(
-                          uri,
-                          body: body,
-                        );
+                    (isAlertEnabled(reminder)['status'] &&
+                            isAlertEnabled(reminder)['code'] == 2)
+                        ? Text('')
+                        : TextButton(
+                            onPressed: () async {
+                              FlutterRingtonePlayer.stop();
+                              Uri uri = Uri.parse('$baseUrl/confirm-alarm');
+                              final body = {
+                                'intake': reminder['intake'].toString(),
+                                'id': reminder['id'].toString()
+                              };
+                              final response = await NetworkController.post(
+                                uri,
+                                body: body,
+                              );
 
-                        if (response != null) {
-                          if (response['message'] == 'success') {
-                            Get.to(
-                              () => const TreatmentScreen(),
-                              transition: Transition.fadeIn,
-                            );
-                            showNotification(
-                              reminder,
-                              isSnoozed: true,
-                              snooze: reminder['often'] * 60,
-                            );
-                          }
-                        }
-                      },
-                      child: const Text(
-                        'Confirm',
-                        style: TextStyle(
-                          color: Colors.green,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    )
+                              if (response != null) {
+                                if (response['message'] == 'success') {
+                                  Get.to(() => const TreatmentScreen(),
+                                      transition: Transition.fadeIn,
+                                      arguments: {'reminder': reminder});
+                                  showNotification(
+                                    reminder,
+                                    isSnoozed: true,
+                                    snooze: reminder['often'] * 60,
+                                  );
+                                }
+                              }
+                            },
+                            child: const Text(
+                              'Confirm',
+                              style: TextStyle(
+                                color: Colors.green,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          )
                   ],
                 ),
                 TextButton(
@@ -168,6 +174,45 @@ class _AlarmDisplayScreenState extends State<AlarmDisplayScreen> {
                     ),
                   ),
                 ),
+                Padding(
+                  padding: const EdgeInsets.all(15),
+                  child: Visibility(
+                    visible: isPatient() && isAlertEnabled(reminder)['status'],
+                    child: Container(
+                      padding: EdgeInsets.symmetric(vertical: 15, horizontal: 8),
+                      decoration: BoxDecoration(
+                          color: const Color.fromARGB(255, 177, 88, 82),
+                          borderRadius: BorderRadius.circular(8)),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: const [
+                              Icon(
+                                Icons.warning_amber_rounded,
+                                color: orange,
+                              ),
+                              SizedBox(width: 8),
+                              Text(
+                                'Warning',
+                                style: TextStyle(
+                                  color: orange,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              )
+                            ],
+                          ),
+                          Text(
+                            isAlertEnabled(reminder)['message'],
+                            style: TextStyle(
+                              color: white,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
                 const Spacer(),
               ],
             ),
@@ -177,112 +222,3 @@ class _AlarmDisplayScreenState extends State<AlarmDisplayScreen> {
     );
   }
 }
-
-
-
-
-// import 'package:flutter/material.dart';
-// import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
-
-// class AlarmDisplayScreen extends StatefulWidget {
-//   const AlarmDisplayScreen({super.key});
-
-//   @override
-//   State<AlarmDisplayScreen> createState() => _AlarmDisplayScreenState();
-// }
-
-// class _AlarmDisplayScreenState extends State<AlarmDisplayScreen> {
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       home: Scaffold(
-//         appBar: AppBar(
-//           title: const Text('Ringtone player'),
-//         ),
-//         body: Center(
-//           child: Column(
-//             children: <Widget>[
-//               Padding(
-//                 padding: const EdgeInsets.all(8),
-//                 child: ElevatedButton(
-//                   child: const Text('playAlarm'),
-//                   onPressed: () {
-//                     FlutterRingtonePlayer.playAlarm();
-//                   },
-//                 ),
-//               ),
-//               Padding(
-//                 padding: const EdgeInsets.all(8),
-//                 child: ElevatedButton(
-//                   child: const Text('playAlarm asAlarm: false'),
-//                   onPressed: () {
-//                     FlutterRingtonePlayer.playAlarm(asAlarm: false);
-//                   },
-//                 ),
-//               ),
-//               Padding(
-//                 padding: const EdgeInsets.all(8),
-//                 child: ElevatedButton(
-//                   child: const Text('playNotification'),
-//                   onPressed: () {
-//                     FlutterRingtonePlayer.playNotification();
-//                   },
-//                 ),
-//               ),
-//               Padding(
-//                 padding: const EdgeInsets.all(8),
-//                 child: ElevatedButton(
-//                   child: const Text('playRingtone'),
-//                   onPressed: () {
-//                     FlutterRingtonePlayer.playRingtone();
-//                   },
-//                 ),
-//               ),
-//               Padding(
-//                 padding: const EdgeInsets.all(8),
-//                 child: ElevatedButton(
-//                   child: const Text('Play from asset (iphone.mp3)'),
-//                   onPressed: () {
-//                     FlutterRingtonePlayer.play(fromAsset: "assets/iphone.mp3");
-//                   },
-//                 ),
-//               ),
-//               Padding(
-//                 padding: const EdgeInsets.all(8),
-//                 child: ElevatedButton(
-//                   child: const Text('Play from asset (android.wav)'),
-//                   onPressed: () {
-//                     FlutterRingtonePlayer.play(fromAsset: "assets/android.wav");
-//                   },
-//                 ),
-//               ),
-//               Padding(
-//                 padding: const EdgeInsets.all(8),
-//                 child: ElevatedButton(
-//                   child: const Text('play'),
-//                   onPressed: () {
-//                     FlutterRingtonePlayer.play(
-//                       android: AndroidSounds.notification,
-//                       ios: IosSounds.glass,
-//                       looping: true,
-//                       volume: 1.0,
-//                     );
-//                   },
-//                 ),
-//               ),
-//               Padding(
-//                 padding: const EdgeInsets.all(8),
-//                 child: ElevatedButton(
-//                   child: const Text('stop'),
-//                   onPressed: () {
-//                     FlutterRingtonePlayer.stop();
-//                   },
-//                 ),
-//               ),
-//             ],
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }

@@ -11,3 +11,5 @@ const secondaryColor = Color(0xff1a1a1a);
 const dividerColor = Color.fromARGB(255, 39, 48, 55);
 const summaryTextColor = Color.fromARGB(255, 104, 82, 81);
 const white = Colors.white;
+const green = Colors.green;
+const red = Colors.red;

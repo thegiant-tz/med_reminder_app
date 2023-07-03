@@ -4,6 +4,7 @@ TextEditingController dateTimePickerController = TextEditingController();
 TextEditingController dosageController = TextEditingController();
 TextEditingController intakeController = TextEditingController();
 TextEditingController descriptionController = TextEditingController();
+TextEditingController alertController = TextEditingController();
 
 
 

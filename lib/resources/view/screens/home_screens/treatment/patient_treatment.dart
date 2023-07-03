@@ -26,17 +26,17 @@ class _PatientTreatmentState extends State<PatientTreatment> {
     final reminder = data['reminder'];
     bool isApproved = reminder['status'] == 'Approved';
     TextEditingController dmedNameController =
-    TextEditingController(text: reminder['med_name'].toString());
+        TextEditingController(text: reminder['med_name'].toString());
     TextEditingController oftenController =
-    TextEditingController(text: reminder['often'].toString());
+        TextEditingController(text: reminder['often'].toString());
     TextEditingController dosageController =
-    TextEditingController(text: reminder['dosage'].toString());
+        TextEditingController(text: reminder['dosage'].toString());
     TextEditingController intakeController =
-    TextEditingController(text: reminder['intake'].toString());
-    TextEditingController timeController =
-    TextEditingController(text: reminder['start_at'].toString());
+        TextEditingController(text: reminder['intake'].toString());
+    TextEditingController alertController =
+        TextEditingController(text: reminder['alert_amount'].toString());
     TextEditingController unitController =
-    TextEditingController(text: reminder['unit']);
+        TextEditingController(text: reminder['unit']);
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -78,250 +78,252 @@ class _PatientTreatmentState extends State<PatientTreatment> {
             actions: isApproved && !isPatient()
                 ? null
                 : (isDoctor()
-                ? [
-              TextButton(
-                onPressed: () {
-                  setState(() {
-                    isEdit = true;
-                  });
-                },
-                child: Row(
-                  children: const [
-                    Icon(
-                      Icons.edit,
-                      color: white,
-                      size: 14,
-                    ),
-                    SizedBox(width: 5),
-                    Text(
-                      'Edit',
-                      style: TextStyle(color: white),
-                    ),
-                  ],
-                ),
-              ),
-              TextButton(
-                onPressed: () {
-                  if (formKey.currentState!.validate()) {
-                    showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          title: const Text('Confirmation'),
-                          content: const Text('Are you sure?'),
-                          actions: [
-                            TextButton(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                                child: const Text(
-                                  'Cancel',
-                                  style: TextStyle(color: Colors.red),
-                                )),
-                            TextButton(
-                                onPressed: () async {
-                                  final response =
-                                  await NetworkController.post(
-                                    Uri.parse(
-                                      '$baseUrl/reminder-confirmation',
-                                    ),
-                                    body: {
-                                      'med_name': dmedNameController.text,
-                                      'unit': unitController.text,
-                                      'intake': intakeController.text,
-                                      'dosage': dosageController.text,
-                                      'often': oftenController.text,
-                                      'start_at': timeController.text,
-                                      'id': reminder['id'].toString()
-                                    },
-                                  );
-                                  if (response != null) {
-                                    if (response['message'] ==
-                                        'success') {
-                                      Get.to(
-                                            () => const TreatmentScreen(),
-                                        transition: Transition.fadeIn,
-                                      );
-                                      showSnackBar(
-                                        context,
-                                        text: 'Reminder approved',
-                                        backgroundColor: Colors.green,
-                                      );
-                                    } else {
-                                      showSnackBar(
-                                        context,
-                                        text: 'Approval failed',
-                                        backgroundColor: Colors.red,
-                                      );
-                                    }
-                                  } else {
-                                    showSnackBar(
-                                      context,
-                                      text: 'Approval failed',
-                                      backgroundColor: Colors.red,
-                                    );
-                                  }
-                                },
-                                child: const Text('Yes I\'m sure')),
-                          ],
-                        );
-                      },
-                    );
-                  }
-                },
-                child: Row(
-                  children: const [
-                    Icon(
-                      Icons.check_circle_outline_outlined,
-                      color: white,
-                      size: 14,
-                    ),
-                    SizedBox(width: 5),
-                    Text(
-                      'Confirm',
-                      style: TextStyle(color: white),
-                    ),
-                  ],
-                ),
-              ),
-            ]
-                : (isPatient() && isApproved)
-                ? [
-              TextButton(
-                onPressed: () {
-                  setState(() {
-                    isEdit = true;
-                  });
-                },
-                child: Row(
-                  children: const [
-                    Icon(
-                      Icons.edit,
-                      color: white,
-                      size: 14,
-                    ),
-                    SizedBox(width: 5),
-                    Text(
-                      'Edit',
-                      style: TextStyle(color: white),
-                    ),
-                  ],
-                ),
-              ),
-              TextButton(
-                onPressed: () {
-                  TextEditingController refillController =
-                  TextEditingController();
-                  showDialog(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        title: const Text('REFILL'),
-                        content: Column(
-                          crossAxisAlignment:
-                          CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Text('Amount'),
-                            const SizedBox(height: 8),
-                            CupertinoTextField(
-                              controller: refillController,
-                              keyboardType: TextInputType.number,
-                              placeholder: 'Type here ...',
-                            )
-                          ],
+                    ? [
+                        TextButton(
+                          onPressed: () {
+                            setState(() {
+                              isEdit = true;
+                            });
+                          },
+                          child: Row(
+                            children: const [
+                              Icon(
+                                Icons.edit,
+                                color: white,
+                                size: 14,
+                              ),
+                              SizedBox(width: 5),
+                              Text(
+                                'Edit',
+                                style: TextStyle(color: white),
+                              ),
+                            ],
+                          ),
                         ),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            child: const Text(
-                              'Cancel',
-                              style: TextStyle(color: Colors.red),
-                            ),
+                        TextButton(
+                          onPressed: () {
+                            if (formKey.currentState!.validate()) {
+                              showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    title: const Text('Confirmation'),
+                                    content: const Text('Are you sure?'),
+                                    actions: [
+                                      TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          child: const Text(
+                                            'Cancel',
+                                            style: TextStyle(color: Colors.red),
+                                          )),
+                                      TextButton(
+                                          onPressed: () async {
+                                            final response =
+                                                await NetworkController.post(
+                                              Uri.parse(
+                                                '$baseUrl/reminder-confirmation',
+                                              ),
+                                              body: {
+                                                'med_name':
+                                                    dmedNameController.text,
+                                                'unit': unitController.text,
+                                                'intake': intakeController.text,
+                                                'dosage': dosageController.text,
+                                                'often': oftenController.text,
+                                                'alert_amount': alertController.text,
+                                                'id': reminder['id'].toString()
+                                              },
+                                            );
+                                            if (response != null) {
+                                              if (response['message'] ==
+                                                  'success') {
+                                                Get.to(
+                                                  () => const TreatmentScreen(),
+                                                  transition: Transition.fadeIn,
+                                                );
+                                                showSnackBar(
+                                                  context,
+                                                  text: 'Reminder approved',
+                                                  backgroundColor: Colors.green,
+                                                );
+                                              } else {
+                                                showSnackBar(
+                                                  context,
+                                                  text: 'Approval failed',
+                                                  backgroundColor: Colors.red,
+                                                );
+                                              }
+                                            } else {
+                                              showSnackBar(
+                                                context,
+                                                text: 'Approval failed',
+                                                backgroundColor: Colors.red,
+                                              );
+                                            }
+                                          },
+                                          child: const Text('Yes I\'m sure')),
+                                    ],
+                                  );
+                                },
+                              );
+                            }
+                          },
+                          child: Row(
+                            children: const [
+                              Icon(
+                                Icons.check_circle_outline_outlined,
+                                color: white,
+                                size: 14,
+                              ),
+                              SizedBox(width: 5),
+                              Text(
+                                'Confirm',
+                                style: TextStyle(color: white),
+                              ),
+                            ],
                           ),
-                          TextButton(
-                            onPressed: () async {
-                              if (refillController
-                                  .text.isNotEmpty) {
-                                Uri uri =
-                                Uri.parse('$baseUrl/refill');
-                                final body = {
-                                  'amount': refillController.text,
-                                  'med_name': dmedNameController.text,
-                                  'unit': unitController.text,
-                                  'intake': intakeController.text,
-                                  'often': oftenController.text,
-                                  'start_at': timeController.text,
-                                  'id': reminder['id'].toString()
-                                };
-                                final response =
-                                await NetworkController.post(
-                                  uri,
-                                  body: body,
-                                );
+                        ),
+                      ]
+                    : (isPatient() && isApproved)
+                        ? [
+                            TextButton(
+                              onPressed: () {
+                                setState(() {
+                                  isEdit = true;
+                                });
+                              },
+                              child: Row(
+                                children: const [
+                                  Icon(
+                                    Icons.edit,
+                                    color: white,
+                                    size: 14,
+                                  ),
+                                  SizedBox(width: 5),
+                                  Text(
+                                    'Edit',
+                                    style: TextStyle(color: white),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                TextEditingController refillController =
+                                    TextEditingController();
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      title: const Text('REFILL'),
+                                      content: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const Text('Amount'),
+                                          const SizedBox(height: 8),
+                                          CupertinoTextField(
+                                            controller: refillController,
+                                            keyboardType: TextInputType.number,
+                                            placeholder: 'Type here ...',
+                                          )
+                                        ],
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          child: const Text(
+                                            'Cancel',
+                                            style: TextStyle(color: Colors.red),
+                                          ),
+                                        ),
+                                        TextButton(
+                                          onPressed: () async {
+                                            if (refillController
+                                                .text.isNotEmpty) {
+                                              Uri uri =
+                                                  Uri.parse('$baseUrl/refill');
+                                              final body = {
+                                                'amount': refillController.text,
+                                                'med_name':
+                                                    dmedNameController.text,
+                                                'unit': unitController.text,
+                                                'intake': intakeController.text,
+                                                'often': oftenController.text,
+                                                'alert_amount': alertController.text,
+                                                'id': reminder['id'].toString()
+                                              };
+                                              final response =
+                                                  await NetworkController.post(
+                                                uri,
+                                                body: body,
+                                              );
 
-                                if (response != null) {
-                                  if (response['message'] ==
-                                      'success') {
-                                    Navigator.pop(context);
-                                    Get.to(
-                                          () =>
-                                      const TreatmentScreen(),
-                                      transition: Transition
-                                          .circularReveal,
-                                      duration: const Duration(
-                                          milliseconds: 500),
+                                              if (response != null) {
+                                                if (response['message'] ==
+                                                    'success') {
+                                                  Navigator.pop(context);
+                                                  Get.to(
+                                                    () =>
+                                                        const TreatmentScreen(),
+                                                    transition: Transition
+                                                        .circularReveal,
+                                                    duration: const Duration(
+                                                        milliseconds: 500),
+                                                  );
+                                                  showSnackBar(context,
+                                                      text: 'Reminder refilled',
+                                                      backgroundColor:
+                                                          Colors.green);
+                                                } else {
+                                                  Navigator.pop(context);
+                                                  showSnackBar(context,
+                                                      text: 'Refill failed',
+                                                      backgroundColor:
+                                                          Colors.red);
+                                                }
+                                              } else {
+                                                Navigator.pop(context);
+                                                showSnackBar(context,
+                                                    text: 'Refill failed',
+                                                    backgroundColor:
+                                                        Colors.red);
+                                              }
+                                            }
+                                          },
+                                          child: const Text(
+                                            'Refill',
+                                            style:
+                                                TextStyle(color: Colors.blue),
+                                          ),
+                                        ),
+                                      ],
                                     );
-                                    showSnackBar(context,
-                                        text: 'Reminder refilled',
-                                        backgroundColor:
-                                        Colors.green);
-                                  } else {
-                                    Navigator.pop(context);
-                                    showSnackBar(context,
-                                        text: 'Refill failed',
-                                        backgroundColor:
-                                        Colors.red);
-                                  }
-                                } else {
-                                  Navigator.pop(context);
-                                  showSnackBar(context,
-                                      text: 'Refill failed',
-                                      backgroundColor:
-                                      Colors.red);
-                                }
-                              }
-                            },
-                            child: const Text(
-                              'Refill',
-                              style:
-                              TextStyle(color: Colors.blue),
+                                  },
+                                );
+                              },
+                              child: Row(
+                                children: const [
+                                  Icon(
+                                    Icons.add_circle_outline,
+                                    color: white,
+                                    size: 14,
+                                  ),
+                                  SizedBox(width: 5),
+                                  Text(
+                                    'Refill',
+                                    style: TextStyle(color: white),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                },
-                child:  Row(
-                  children: const [
-                    Icon(
-                      Icons.add_circle_outline,
-                      color: white,
-                      size: 14,
-                    ),
-                    SizedBox(width: 5),
-                    Text(
-                      'Refill',
-                      style: TextStyle(color: white),
-                    ),
-                  ],
-                ),
-              ),
-            ]
-                : null),
+                          ]
+                        : null),
           ),
           SliverToBoxAdapter(
             child: Padding(
@@ -336,21 +338,63 @@ class _PatientTreatmentState extends State<PatientTreatment> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      Visibility(
+                        visible:
+                            isPatient() && isAlertEnabled(reminder)['status'],
+                        child: Container(
+                          padding:
+                              EdgeInsets.symmetric(vertical: 15, horizontal: 8),
+                          decoration: BoxDecoration(
+                              color: const Color.fromARGB(255, 177, 88, 82),
+                              borderRadius: BorderRadius.circular(8)),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: const [
+                                  Icon(
+                                    Icons.warning_amber_rounded,
+                                    color: orange,
+                                  ),
+                                  SizedBox(width: 8),
+                                  Text(
+                                    'Warning',
+                                    style: TextStyle(
+                                      color: orange,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  )
+                                ],
+                              ),
+                              Text(
+                                isAlertEnabled(reminder)['message'],
+                                style: TextStyle(
+                                  color: white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 15,
+                      ),
                       const Text('Medication name'),
                       TextFormField(
                         readOnly: !isEdit,
                         controller: dmedNameController,
                         decoration: const InputDecoration(
-                            floatingLabelStyle: TextStyle(
-                              color: secondaryColor,
-                              fontSize: defaultSize,
-                            ),
-                            focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: primaryColor),
-                            ),
-                            enabledBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: primaryColor),
-                            )),
+                          floatingLabelStyle: TextStyle(
+                            color: secondaryColor,
+                            fontSize: defaultSize,
+                          ),
+                          focusedBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(color: primaryColor),
+                          ),
+                          enabledBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(color: primaryColor),
+                          ),
+                        ),
                         validator: (value) {
                           if (value!.isEmpty) {
                             return 'This field cannot be empty';
@@ -454,10 +498,10 @@ class _PatientTreatmentState extends State<PatientTreatment> {
                         },
                       ),
                       const SizedBox(height: 15),
-                      const Text('Remind start at'),
+                      const Text('Alert when below'),
                       TextFormField(
                         readOnly: !isEdit,
-                        controller: timeController,
+                        controller: alertController,
                         keyboardType: TextInputType.datetime,
                         decoration: const InputDecoration(
                             floatingLabelStyle: TextStyle(
@@ -477,10 +521,10 @@ class _PatientTreatmentState extends State<PatientTreatment> {
                           return null;
                         },
                       ),
-
                       const SizedBox(height: 15),
                       const Text('Descriptions:'),
-                      Text(reminder['description'] ?? 'No description provided.'),
+                      Text(reminder['description'] ??
+                          'No description provided.'),
                     ],
                   ),
                 ),

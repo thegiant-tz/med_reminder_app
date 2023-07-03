@@ -98,17 +98,13 @@ void showSnackBar(
 }
 
 void showNotification(reminder, {int snooze = 2, bool isSnoozed = false}) {
-  final date = formattedDateTime(DateTime.now(), format: 'yyyy-MM-dd') +
-      ' ' +
-      reminder['start_at'];
-
   NotificationService.showNotification(
       id: reminder['id'],
       title: 'Medication Reminder',
       body: reminder['description'] ??
           'Habari, Muda wa kumeza dawa umewadia, Hakikisha unaweza dawa kwa wakati',
       scheduled: true,
-      fromDate: isSnoozed ? DateTime.now() : DateTime.parse(date),
+      fromDate: DateTime.now(),
       interval: isSnoozed ? snooze : reminder['often'] * 60,
       payload: {'payload': "true", 'reminder': jsonEncode(reminder)});
 }
@@ -157,6 +153,8 @@ alertDialog(
   BuildContext context, {
   Widget? title,
   Widget? content,
+  String? cancelButtonText,
+  String? confirmButtonText,
   void Function()? onCancel,
   void Function()? onConfirm,
 }) {
@@ -172,9 +170,9 @@ alertDialog(
                 () {
                   Navigator.pop(context);
                 },
-            child: const Text(
-              'Cancel',
-              style: TextStyle(color: Colors.red),
+            child: Text(
+              cancelButtonText ?? 'Cancel',
+              style: const TextStyle(color: Colors.red),
             ),
           ),
           TextButton(
@@ -182,13 +180,35 @@ alertDialog(
                 () {
                   Navigator.pop(context);
                 },
-            child: const Text(
-              'Yes, I\'m sure',
-              style: TextStyle(color: Colors.blue),
+            child: Text(
+              confirmButtonText ?? 'Yes, I\'m sure',
+              style: const TextStyle(color: Colors.blue),
             ),
           ),
         ],
       );
     },
   );
+}
+
+Map isAlertEnabled(Map reminders) {
+  if (reminders['intake'] > reminders['dosage']) {
+    return {
+      'message': 'Next intake amount is greater than current dosage amount',
+      'status': true,
+      'code': 2
+    };
+  } else if (reminders['dosage'] < reminders['alert_amount']) {
+    return {
+      'message': 'Your dose is almost done',
+      'status': true,
+      'code': 1
+    };
+    
+  }
+  return {
+      'message': 'Enough dosage',
+      'status': false,
+      'code': 3
+    };
 }

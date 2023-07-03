@@ -1,6 +1,7 @@
 // ignore_for_file: must_be_immutable, use_build_context_synchronously, prefer_const_constructors
 
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -220,21 +221,62 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
                                   },
                                 );
                               } else if (value == 'info') {
-                                Get.to(
-                                  () => const PatientTreatment(),
-                                  transition: Transition.circularReveal,
-                                  duration: const Duration(milliseconds: 500),
-                                  arguments: {
-                                    'reminder': reminders[index],
-                                    'user': GetStorage().read('user')
-                                  }
+                                Get.to(() => const PatientTreatment(),
+                                    transition: Transition.circularReveal,
+                                    duration: const Duration(milliseconds: 500),
+                                    arguments: {
+                                      'reminder': reminders[index],
+                                      'user': GetStorage().read('user')
+                                    });
+                              } else if (value == 'delete') {
+                                alertDialog(
+                                  context,
+                                  title: Text('Delete reminder'),
+                                  confirmButtonText: 'Yes, Delete',
+                                  content: Text(
+                                    'Do you want to delete this reminder?',
+                                  ),
+                                  onConfirm: () async {
+                                    Uri uri = Uri.parse('$baseUrl/delete');
+                                    final body = {
+                                      'id': reminders[index]['id'].toString(),
+                                    };
+                                    final response =
+                                        await NetworkController.post(
+                                      uri,
+                                      body: body,
+                                    );
+                                    if (response != null) {
+                                      if (response['message'] == 'success') {
+                                        initializedFunctions();
+                                        showSnackBar(
+                                          context,
+                                          text: 'Reminder deleted',
+                                          backgroundColor: green,
+                                        );
+                                      } else {
+                                        showSnackBar(
+                                          context,
+                                          text: 'Reminder not deleted',
+                                          backgroundColor: red,
+                                        );
+                                      }
+                                    } else {
+                                      showSnackBar(
+                                        context,
+                                        text: 'Reminder not deleted',
+                                        backgroundColor: red,
+                                      );
+                                    }
+                                    Navigator.pop(context);
+                                  },
                                 );
                               }
                             },
                             position: PopupMenuPosition.under,
                             itemBuilder: (context) {
                               return <PopupMenuEntry>[
-                                 PopupMenuItem(
+                                PopupMenuItem(
                                   value: 'info',
                                   child: Row(
                                     children: const [
@@ -263,6 +305,23 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
                                       SizedBox(width: 8),
                                       Text(
                                         'Refill',
+                                        style: TextStyle(color: white),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                PopupMenuItem(
+                                  value: 'delete',
+                                  child: Row(
+                                    children: const [
+                                      Icon(
+                                        Icons.delete_forever,
+                                        size: 14,
+                                        color: orange,
+                                      ),
+                                      SizedBox(width: 8),
+                                      Text(
+                                        'Delete',
                                         style: TextStyle(color: white),
                                       ),
                                     ],
@@ -396,12 +455,18 @@ class MyCard extends StatefulWidget {
 
 class _MyCardState extends State<MyCard> {
   bool isON = false;
+  final data = Get.arguments;
+  Map alertedReminder = {'id': 0};
   @override
   Widget build(BuildContext context) {
     bool isApproved = widget.reminders['status'] == 'Approved';
     // setState(() {
     //   isON = widget.reminders['switch_state'].toString() == "1";
     // });
+    if (data != null) {
+      alertedReminder = data['reminder'];
+    }
+
     return Card(
       margin: const EdgeInsets.symmetric(
         horizontal: 5,
@@ -436,7 +501,8 @@ class _MyCardState extends State<MyCard> {
                     child: Switch(
                         activeColor: white,
                         activeTrackColor: Colors.green,
-                        value: isON && isApproved,
+                        value: (isON && isApproved) ||
+                            (alertedReminder['id'] == widget.reminders['id']),
                         onChanged: (value) {
                           if (isApproved) {
                             if (value) {
@@ -484,20 +550,6 @@ class _MyCardState extends State<MyCard> {
                   )
                 ],
               ),
-              Row(
-                children: [
-                  const Expanded(
-                    child: Text(
-                      'Start at:',
-                      style: TextStyle(color: primaryColor),
-                    ),
-                  ),
-                  Text(
-                    widget.reminders['start_at'],
-                    style: const TextStyle(color: black),
-                  )
-                ],
-              ),
               const Divider(
                 color: primaryColor,
               ),
@@ -515,14 +567,6 @@ class _MyCardState extends State<MyCard> {
                         ),
                       ),
                     ),
-                    // const Expanded(
-                    //   child: Center(
-                    //     child: Text(
-                    //       'Remains: - pills',
-                    //       style: TextStyle(color: summaryTextColor, fontSize: 10),
-                    //     ),
-                    //   ),
-                    // ),
                     Expanded(
                       child: Center(
                         child: Text(
@@ -534,19 +578,36 @@ class _MyCardState extends State<MyCard> {
                         ),
                       ),
                     ),
-
                     Expanded(
                       child: Center(
                           child: Badge(
                         backgroundColor: isApproved ? orange : Colors.red,
                         label: isApproved
-                            ? const Text(
+                            ? Text(
                                 'Approved',
                                 style: TextStyle(color: primaryColor),
                               )
-                            : const Text('Pending'),
+                            : Text('Pending'),
                       )),
                     ),
+                    Visibility(
+                      visible: isAlertEnabled(widget.reminders)['status'],
+                      child: SizedBox(
+                        width: 30,
+                        height: 20,
+                        child: AnimatedTextKit(
+                          repeatForever: true,
+                          animatedTexts: [
+                            FadeAnimatedText("⚠️",
+                                textStyle: TextStyle(
+                                  color: orange,
+                                  fontSize: 18,
+                                ),
+                                duration: const Duration(milliseconds: 1000))
+                          ],
+                        ),
+                      ),
+                    )
                   ],
                 ),
               )
