@@ -17,6 +17,12 @@ class ReminderController {
     return response;
   }
 
+  static Future getPatients() async {
+    Uri uri = Uri.parse('$baseUrl/get-patients');
+    final response = await NetworkController.fetch(uri);
+    return response;
+  }
+
   static Future getPendingReminders() async {
     final response = await NetworkController.fetch(
         Uri.parse('$baseUrl/get-pending-Patients'));

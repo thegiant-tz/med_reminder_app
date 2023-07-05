@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, prefer_interpolation_to_compose_strings
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -29,6 +29,27 @@ class _AddTreatmentState extends State<AddTreatment> {
   String? reminderStartAt = DateTime.now().toString();
   TextEditingController medController = TextEditingController();
   final formkey = GlobalKey<FormState>();
+  final data = Get.arguments;
+  List<String> users = ['-- Choose --'];
+  String userName = '-- Choose --';
+  String selectedUserId = '';
+
+  preparedUserList() {
+    if (data != null) {
+      for (var i = 0; i < (data['users'] as List).length; i++) {
+        users.add(
+            data['users'][i]['id'].toString() + '%' + data['users'][i]['name']);
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    preparedUserList();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -55,6 +76,48 @@ class _AddTreatmentState extends State<AddTreatment> {
                       padding: const EdgeInsets.symmetric(horizontal: 8),
                       child: Column(
                         children: [
+                          Container(
+                            width: double.infinity,
+                            decoration: const BoxDecoration(
+                              color: white,
+                            ),
+                            child: const Text(
+                              'Choose patient',
+                              style: TextStyle(
+                                color: black,
+                                fontSize: defaultSize,
+                              ),
+                            ),
+                          ),
+                          DropdownButton(
+                            isExpanded: true,
+                            hint: Text(
+                              userName,
+                              style: const TextStyle(
+                                color: black,
+                              ),
+                            ),
+                            items: users
+                                .map<DropdownMenuItem<String>>((String value) {
+                              
+                              if (value.split('%').length > 1) {
+                                userName = value.split('%')[1];
+                              }
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(userName),
+                              );
+                            }).toList(),
+                            onChanged: (String? value) {
+                              String userId = value!.split('%')[0];
+                              String username = value.split('%')[1];
+                              setState(() {
+                                userName = username;
+                                selectedUserId = userId;
+                              });
+                            },
+                          ),
+                          const SizedBox(height: 30),
                           TextFormField(
                             style: const TextStyle(color: black),
                             decoration: const InputDecoration(
@@ -204,7 +267,7 @@ class _AddTreatmentState extends State<AddTreatment> {
                         validator: (value) {
                           if (value!.isEmpty) {
                             return 'This field cannot be empty';
-                          }else if (double.parse(value) >=
+                          } else if (double.parse(value) >=
                               double.parse(dosageController.text)) {
                             return "Intake amount should be less than or equal to dosage amount";
                           }

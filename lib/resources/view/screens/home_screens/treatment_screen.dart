@@ -24,6 +24,7 @@ class TreatmentScreen extends StatefulWidget {
 
 class _TreatmentScreenState extends State<TreatmentScreen> {
   List reminders = [];
+  List users = [];
 
   @override
   void initState() {
@@ -74,13 +75,14 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
                 automaticallyImplyLeading: false,
                 backgroundColor: primaryColor,
               ),
-              floatingActionButton: isDoctor()
+              floatingActionButton: isPatient()
                   ? null
                   : ElevatedButton.icon(
                       onPressed: () {
                         Get.to(() => const AddTreatment(),
                             transition: Transition.cupertino,
-                            duration: const Duration(microseconds: 1000));
+                            duration: const Duration(microseconds: 1000),
+                            arguments: {'users': users});
                       },
                       icon: const Icon(Icons.alarm_add),
                       label: const Text(
@@ -348,7 +350,9 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
                           return ListTile(
                             title: Row(
                               children: [
-                                Expanded(child: Text(user['name'])),
+                                Expanded(
+                                    child:
+                                        Text(user == null ? '' : user['name'])),
                                 Badge(
                                   backgroundColor:
                                       isApproved ? orange : Colors.red,
@@ -438,6 +442,16 @@ class _TreatmentScreenState extends State<TreatmentScreen> {
           reminders = [];
         }
       });
+
+      final userResponse = await ReminderController.getPatients();
+
+      setState(() {
+        if (userResponse['data'] != null) {
+          users = userResponse['data'] as List;
+        } else {
+          users = [];
+        }
+      });
     }
   }
 }
@@ -465,7 +479,7 @@ class _MyCardState extends State<MyCard> {
     //   isON = widget.reminders['switch_state'].toString() == "1";
     // });
     if (data != null) {
-      alertedReminder = data['reminder'];
+      alertedReminder = data['reminder'] ?? {};
     }
 
     return Card(
