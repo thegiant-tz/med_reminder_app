@@ -35,15 +35,15 @@ class _SignInScreenState extends State<SignInScreen> {
   Widget build(BuildContext context) {
     final double h = MediaQuery.of(context).size.height;
     const TextStyle inputStyle = TextStyle(color: secondaryColor);
-    return WillPopScope(
-      onWillPop: () => Future(() => false),
-      child: AnnotatedRegion<SystemUiOverlayStyle>(
-        value: const SystemUiOverlayStyle(
-          systemNavigationBarColor: primaryColor,
-          systemNavigationBarIconBrightness: Brightness.light,
-          statusBarColor: primaryColor,
-          statusBarIconBrightness: Brightness.light,
-        ),
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: const SystemUiOverlayStyle(
+        systemNavigationBarColor: primaryColor,
+        systemNavigationBarIconBrightness: Brightness.light,
+        statusBarColor: primaryColor,
+        statusBarIconBrightness: Brightness.light,
+      ),
+      child: WillPopScope(
+        onWillPop: () => Future(() => false),
         child: Scaffold(
           backgroundColor: const Color.fromARGB(255, 234, 235, 235),
           appBar: const CupertinoNavigationBar(

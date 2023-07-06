@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:medication_reminder_app/app/helpers/color_helper.dart';
 import 'package:medication_reminder_app/app/services/create_user_id_service.dart';
 import 'package:medication_reminder_app/resources/view/screens/signin_screen.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -31,52 +33,60 @@ class _OnBoardingState extends State<OnBoarding> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(children: [
-        PageView(
-          controller: _controller,
-          onPageChanged: (index) {
-            setState(() {
-              isLastPage = index == 2;
-            });
-          },
-          children: [
-            PageViewSlide1(txtStyle: txtStyle),
-            PageViewSlide2(txtStyle: txtStyle),
-            const SignInScreen(),
-          ],
-        ),
-        Visibility(
-          visible: !isLastPage,
-          child: Container(
-            alignment: const Alignment(0, 0.9),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    _controller.jumpToPage(2);
-                  },
-                  child: const Text('Skip'),
-                ),
-                SmoothPageIndicator(
-                  count: 3,
-                  controller: _controller,
-                  effect: const WormEffect(activeDotColor: Colors.black),
-                ),
-                GestureDetector(
-                  onTap: () {
-                    _controller.nextPage(
-                        duration: const Duration(milliseconds: 500),
-                        curve: Curves.easeIn);
-                  },
-                  child: const Text('Next'),
-                )
-              ],
-            ),
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: const SystemUiOverlayStyle(
+        systemNavigationBarColor: primaryColor,
+        systemNavigationBarIconBrightness: Brightness.light,
+        statusBarColor: primaryColor,
+        statusBarIconBrightness: Brightness.light,
+      ),
+      child: Scaffold(
+        body: Stack(children: [
+          PageView(
+            controller: _controller,
+            onPageChanged: (index) {
+              setState(() {
+                isLastPage = index == 2;
+              });
+            },
+            children: [
+              PageViewSlide1(txtStyle: txtStyle),
+              PageViewSlide2(txtStyle: txtStyle),
+              const SignInScreen(),
+            ],
           ),
-        )
-      ]),
+          Visibility(
+            visible: !isLastPage,
+            child: Container(
+              alignment: const Alignment(0, 0.9),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      _controller.jumpToPage(2);
+                    },
+                    child: const Text('Skip'),
+                  ),
+                  SmoothPageIndicator(
+                    count: 3,
+                    controller: _controller,
+                    effect: const WormEffect(activeDotColor: Colors.black),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      _controller.nextPage(
+                          duration: const Duration(milliseconds: 500),
+                          curve: Curves.easeIn);
+                    },
+                    child: const Text('Next'),
+                  )
+                ],
+              ),
+            ),
+          )
+        ]),
+      ),
     );
   }
 }
