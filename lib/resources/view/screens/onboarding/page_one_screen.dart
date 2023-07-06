@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'package:flutter/material.dart';
+import 'package:flutter_shake_animated/flutter_shake_animated.dart';
 class PageViewSlide1 extends StatelessWidget {
   const PageViewSlide1({
     super.key,
@@ -12,7 +13,7 @@ class PageViewSlide1 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(color: Color(0xffffffff)),
+      decoration: BoxDecoration(color: const Color.fromARGB(255, 234, 235, 235)),
       child: Padding(
         padding: const EdgeInsets.all(15.0),
         child: Column(
@@ -29,7 +30,12 @@ class PageViewSlide1 extends StatelessWidget {
               ),
             ),
             Spacer(),
-            Image.asset('assets/images/onboarding/6.png'),
+            ShakeWidget(
+                  shakeConstant: ShakeRotateConstant1(),
+                  autoPlay: true,
+                  enableWebMouseHover: true,
+                  child: Image.asset('assets/images/onboarding/6.png'),
+                ),
             SizedBox(height: 20),
             RichText(
               textAlign: TextAlign.center,

@@ -118,10 +118,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ),
                         const SizedBox(width: 15),
                         ChoiceChip(
-                          label: Text('Patient',
+                          label: Text(
+                            'Patient',
                             style: TextStyle(
                               color: isPatientSelected ? white : black,
-                            ),),
+                            ),
+                          ),
                           // avatar: const Icon(Icons.directions_car),
                           selected: isPatientSelected,
                           tooltip: 'Register as patient',
@@ -404,27 +406,13 @@ class _SignUpFieldsState extends State<SignUpFields> {
                     if (csrf1.currentState!.validate() &&
                         widget.role != 'null') {
                       Map<String, String> body;
-                      if (widget.role == 'Recruiter' && isCompanyChecked) {
-                        body = {
-                          'name': nameController.text,
-                          'email': emailController.text,
-                          'phone': phoneController.text,
-                          'password': passwordController.text,
-                          'role_name': widget.role,
-                          'cmp_name': cmpNameController.text,
-                          'cmp_phone': cmpPhoneController.text,
-                          'cmp_email': cmpEmailController.text,
-                          'tin_no': tinController.text
-                        };
-                      } else {
-                        body = {
-                          'name': nameController.text,
-                          'email': emailController.text,
-                          'phone': phoneController.text,
-                          'password': passwordController.text,
-                          'role_name': widget.role
-                        };
-                      }
+                      body = {
+                        'name': nameController.text,
+                        'email': emailController.text,
+                        'phone': phoneController.text,
+                        'password': passwordController.text,
+                        'role_name': widget.role
+                      };
 
                       setState(() {
                         isLoading = true;
@@ -439,6 +427,11 @@ class _SignUpFieldsState extends State<SignUpFields> {
                         isLoading = false;
                       });
                       if (response['message'] == 'success') {
+                        nameController.clear();
+                        phoneController.clear();
+                        emailController.clear();
+                        passwordController.clear();
+                        confirmPasswordController.clear();
                         String dialogBody =
                             'Dear customer your registration has completed successfull, click continue to navigate your home page.. Thank you';
                         successLoginMessageAndRedirect(

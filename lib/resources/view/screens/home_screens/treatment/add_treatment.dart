@@ -75,6 +75,7 @@ class _AddTreatmentState extends State<AddTreatment> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8),
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Container(
                             width: double.infinity,
@@ -99,7 +100,6 @@ class _AddTreatmentState extends State<AddTreatment> {
                             ),
                             items: users
                                 .map<DropdownMenuItem<String>>((String value) {
-                              
                               if (value.split('%').length > 1) {
                                 userName = value.split('%')[1];
                               }
@@ -116,6 +116,13 @@ class _AddTreatmentState extends State<AddTreatment> {
                                 selectedUserId = userId;
                               });
                             },
+                          ),
+                          Visibility(
+                            visible: selectedUserId.isEmpty,
+                            child: const Text(
+                              'This field cannot be empty',
+                              style: TextStyle(color: red),
+                            ),
                           ),
                           const SizedBox(height: 30),
                           TextFormField(
@@ -337,7 +344,8 @@ class _AddTreatmentState extends State<AddTreatment> {
                         foregroundColor: white,
                       ),
                       onPressed: () {
-                        if (formkey.currentState!.validate()) {
+                        if (formkey.currentState!.validate() &&
+                            selectedUserId.isNotEmpty) {
                           showDialog(
                               barrierDismissible: false,
                               context: context,
@@ -374,7 +382,7 @@ class _AddTreatmentState extends State<AddTreatment> {
                                           'dosage': dosageController.text,
                                           'intake': intakeController.text,
                                           'alert_amount': alertController.text,
-                                          // 'start_at': reminderStartAt,
+                                          'patient_id': selectedUserId,
                                           'description':
                                               descriptionController.text
                                         };
@@ -386,6 +394,17 @@ class _AddTreatmentState extends State<AddTreatment> {
 
                                         if (response['message'] == 'success') {
                                           // showNotification(response['data']);
+                                          medController.clear();
+                                          setState(() {
+                                            unit = unitList.first;
+                                            often = oftenList.first;
+                                            userName = '-- Choose --';
+                                            selectedUserId = '';
+                                          });
+                                          dosageController.clear();
+                                          intakeController.clear();
+                                          alertController.clear();
+                                          descriptionController.clear();
                                           showSnackBar(context,
                                               text: 'Reminder added',
                                               backgroundColor: Colors.green);

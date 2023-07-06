@@ -13,7 +13,7 @@ class PageViewSlide2 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(color: Color(0xffffffff)),
+      decoration: BoxDecoration(color: const Color.fromARGB(255, 234, 235, 235)),
       child: Padding(
         padding: const EdgeInsets.all(15.0),
         child: Column(
