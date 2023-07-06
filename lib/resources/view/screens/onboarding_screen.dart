@@ -3,8 +3,6 @@ import 'package:get_storage/get_storage.dart';
 import 'package:medication_reminder_app/app/services/create_user_id_service.dart';
 import 'package:medication_reminder_app/resources/view/screens/signin_screen.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-
-import 'onboarding/page_three_screen.dart';
 import 'onboarding/page_one_screen.dart';
 import 'onboarding/page_two_screen.dart';
 

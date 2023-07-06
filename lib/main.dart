@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:medication_reminder_app/app/services/notification_service.dart';
 import 'package:medication_reminder_app/resources/view/screens/onboarding_screen.dart';
-import 'package:medication_reminder_app/resources/view/screens/signin_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
